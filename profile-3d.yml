@@ -1,0 +1,45 @@
+name: 🌐 Generate 3D Contribution Graph
+
+on:
+  schedule:
+    # Runs daily at 18:00 UTC
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Generate 3D Profile
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate 3D Contribution Graph
+        uses: yoshi389111/github-profile-3d-contrib@0.7.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: Ahmedyasser1905
+          # Theme: night-rainbow gives a premium dark look with colorful towers
+          SETTING_JSON: |
+            {
+              "githubUserName": "Ahmedyasser1905",
+              "themeContext": "dark",
+              "type": "normal",
+              "backgroundColor": "#0d0620",
+              "foregroundColor": "#a78bfa",
+              "contributeBoard": {
+                "invertColor": false,
+                "colors": ["#1e0a3c", "#4c1d95", "#6d28d9", "#7c3aed", "#a78bfa"]
+              }
+            }
+
+      - name: Commit and push 3D graph
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🌐 Update 3D contribution graph"
+          branch: main

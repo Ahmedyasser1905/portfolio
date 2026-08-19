@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ahmed Yasser — Mobile Engineer, Full-Stack Developer & AI Integrator from Algeria. 30+ shipped products.">
+  <meta property="og:title" content="Ahmed Yasser — Digital Lab">
+  <meta property="og:description" content="Mobile Engineer · Full-Stack Developer · AI Integrator · 30+ shipped products">
+  <meta property="og:url" content="https://potfolio-six-neon.vercel.app/">
+  <link rel="canonical" href="https://potfolio-six-neon.vercel.app/">
+  <title>Ahmed Yasser — Digital Lab</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- GSAP + ScrollTrigger (free, CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN SYSTEM
+═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg:        #040608;
+  --surface:   #080d18;
+  --surface2:  #0d1525;
+  --violet:    #7c3aed;
+  --violet2:   #a78bfa;
+  --cyan:      #06b6d4;
+  --cyan2:     #67e8f9;
+  --rose:      #f43f5e;
+  --green:     #10b981;
+  --orange:    #f97316;
+  --text:      #f1f5f9;
+  --text-soft: #cbd5e1;
+  --muted:     #475569;
+  --border:    rgba(124,58,237,0.18);
+  --border2:   rgba(6,182,212,0.15);
+  --glow-v:    0 0 40px rgba(124,58,237,0.4);
+  --glow-c:    0 0 40px rgba(6,182,212,0.4);
+  --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:   cubic-bezier(0.7, 0, 0.84, 0);
+}
+
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+/* Defensive clip — the actual root causes are fixed below, this is the safety net */
+html { scroll-behavior: auto; overflow-x: clip; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  overflow-x: clip; /* clip not hidden — doesn't create scroll on iOS/mobile */
+  cursor: none;
+}
+
+@media (pointer: coarse) { body { cursor: auto; } }
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+}
+
+/* ── SCROLLBAR ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--violet); border-radius: 2px; }
+
+/* ── LOADER ──────────────────────────────────────────────── */
+#loader {
+  position: fixed; inset: 0; z-index: 10000;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 28px;
+  transition: opacity 0.7s var(--ease-in), visibility 0.7s;
+}
+#loader.done { opacity: 0; visibility: hidden; pointer-events: none; }
+.loader-logo {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900; font-size: clamp(2.5rem, 8vw, 5rem);
+  color: transparent;
+  background: linear-gradient(135deg, var(--violet2), var(--cyan));
+  -webkit-background-clip: text; background-clip: text;
+  letter-spacing: 8px;
+}
+.loader-bar {
+  width: min(260px, 70vw); height: 1px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+.loader-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--violet), var(--cyan));
+  width: 0; animation: loaderFill 1.4s var(--ease-out) forwards;
+}
+.loader-label {
+  font-size: 0.6rem; letter-spacing: 6px;
+  color: var(--muted); text-transform: uppercase;
+}
+@keyframes loaderFill { to { width: 100%; } }
+
+/* ── CUSTOM CURSOR ───────────────────────────────────────── */
+#cur { position:fixed; z-index:9999; pointer-events:none; mix-blend-mode: normal; top:0; left:0; }
+#cur-dot {
+  width: 8px; height: 8px;
+  background: var(--cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--cyan);
+  transform: translate(-50%,-50%);
+}
+#cur-ring {
+  width: 32px; height: 32px;
+  border: 1px solid rgba(6,182,212,0.5);
+  border-radius: 50%;
+  transform: translate(-50%,-50%);
+  transition: width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s;
+}
+#cur-ring.hover {
+  width: 52px; height: 52px;
+  border-color: rgba(167,139,250,0.7);
+}
+@media (pointer: coarse) { #cur { display: none; } }
+
+/* ── SCROLL PROGRESS ─────────────────────────────────────── */
+#progress {
+  position: fixed; top: 0; left: 0;
+  height: 2px; z-index: 200;
+  background: linear-gradient(90deg, var(--violet), var(--cyan));
+  width: 0%; transition: width 0.1s linear;
+}
+
+/* ── THREE.JS CANVAS ─────────────────────────────────────── */
+#bg {
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none;
+}
+
+/* ── NAV ─────────────────────────────────────────────────── */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 20px 6vw;
+  transition: background 0.4s, border-color 0.4s;
+}
+nav.scrolled {
+  background: rgba(4,6,8,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900; font-size: 0.85rem;
+  color: var(--text); letter-spacing: 4px;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--cyan); }
+.nav-links { display:flex; gap: 40px; list-style:none; align-items:center; }
+.nav-links a {
+  color: var(--muted); font-size: 0.65rem;
+  text-decoration: none; letter-spacing: 3px;
+  text-transform: uppercase;
+  transition: color 0.2s;
+  position: relative;
+}
+.nav-links a::after {
+  content: ''; position:absolute; bottom:-4px; left:0;
+  width: 0; height: 1px;
+  background: var(--cyan);
+  transition: width 0.3s var(--ease-out);
+}
+.nav-links a.active, .nav-links a:hover { color: var(--text); }
+.nav-links a.active::after, .nav-links a:hover::after { width: 100%; }
+.nav-cta {
+  display:inline-flex; padding: 8px 20px;
+  border: 1px solid var(--border);
+  color: var(--violet2); font-size: 0.62rem;
+  letter-spacing: 2px; text-transform: uppercase;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.nav-cta:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: var(--glow-c); }
+@media (max-width: 768px) {
+  .nav-links { display:none; }
+  nav { padding: 16px 24px; }
+}
+
+/* ── MAIN / SECTIONS ─────────────────────────────────────── */
+main { position: relative; z-index: 1; }
+
+/* ── HERO ────────────────────────────────────────────────── */
+#hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 0 8vw;
+  gap: 40px;
+  position: relative;
+  /* 100vw includes scrollbar width on some browsers → use 100% instead */
+  max-width: 100%;
+}
+@media (max-width: 900px) {
+  #hero { grid-template-columns: 1fr; padding-top: 100px; }
+  .hero-right { display: none; }
+}
+
+.hero-status {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.6rem; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--green); margin-bottom: 24px;
+  opacity: 0; transform: translateY(20px);
+}
+.hero-status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: statusPulse 2s infinite;
+}
+@keyframes statusPulse {
+  0%,100% { opacity:1; } 50% { opacity:0.3; }
+}
+.hero-name {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(3.2rem, 7vw, 6.5rem);
+  line-height: 0.88;
+  color: var(--text);
+  margin-bottom: 20px;
+  opacity: 0; transform: translateY(30px);
+}
+.hero-name em {
+  display: block;
+  color: transparent;
+  background: linear-gradient(135deg, var(--violet2) 0%, var(--cyan) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  font-style: normal;
+}
+.hero-role {
+  font-size: clamp(0.72rem, 1.5vw, 0.9rem);
+  color: var(--muted); margin-bottom: 28px;
+  opacity: 0; transform: translateY(20px);
+  line-height: 1.6;
+}
+.hero-role strong { color: var(--violet2); }
+.hero-statement {
+  font-size: 0.72rem; color: var(--text-soft);
+  border-left: 2px solid var(--cyan);
+  padding-left: 16px; margin-bottom: 48px;
+  opacity: 0; transform: translateY(20px);
+  max-width: 440px; line-height: 1.9;
+}
+.hero-ctas {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  opacity: 0; transform: translateY(20px);
+}
+.btn {
+  display: inline-flex; align-items:center; gap:8px;
+  padding: 13px 28px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  text-decoration: none; border: none; cursor: none;
+  transition: all 0.25s var(--ease-out);
+  position: relative; overflow: hidden;
+}
+.btn::before {
+  content:''; position:absolute; inset:0;
+  background: rgba(255,255,255,0.06);
+  transform: translateX(-100%);
+  transition: transform 0.35s var(--ease-out);
+}
+.btn:hover::before { transform: translateX(0); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--violet), #5b21b6);
+  color: #fff;
+  box-shadow: 0 0 30px rgba(124,58,237,0.4);
+}
+.btn-primary:hover { box-shadow: 0 0 50px rgba(124,58,237,0.6); transform:translateY(-2px); }
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+}
+.btn-ghost:hover { border-color: var(--cyan2); color: var(--cyan2); box-shadow: var(--glow-c); }
+.hero-scroll-hint {
+  position: absolute; bottom: 40px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column;
+  align-items: center; gap: 10px;
+  opacity: 0; animation: fadeIn 1s 2s forwards;
+}
+.hero-scroll-hint span {
+  font-size: 0.5rem; letter-spacing: 4px;
+  color: var(--muted); text-transform: uppercase;
+}
+.scroll-line {
+  width: 1px; height: 48px;
+  background: linear-gradient(var(--violet), transparent);
+  animation: scrollPulse 2s infinite;
+}
+@keyframes scrollPulse { 0% { opacity:0.2; } 50% { opacity:1; } 100% { opacity:0.2; } }
+@keyframes fadeIn { to { opacity: 1; } }
+
+/* ── HERO RIGHT PANEL ────────────────────────────────────── */
+.hero-right {
+  display: flex; align-items: center; justify-content: center;
+  position: relative; height: 500px;
+}
+.hero-panel {
+  position: relative; width: 340px; height: 420px;
+  opacity: 0; transform: translateX(40px);
+}
+.hero-panel-card {
+  position: absolute;
+  background: rgba(13,21,37,0.8);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  padding: 16px 20px;
+  font-size: 0.62rem;
+}
+.hero-panel-card.main {
+  inset: 0;
+  display: flex; flex-direction: column;
+  align-items: flex-start; gap: 20px;
+  border-color: rgba(124,58,237,0.3);
+  box-shadow: 0 0 60px rgba(124,58,237,0.12), inset 0 0 60px rgba(124,58,237,0.03);
+}
+.panel-terminal {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem; color: var(--muted); line-height: 1.8;
+  width: 100%;
+}
+.panel-terminal .t-green { color: var(--green); }
+.panel-terminal .t-cyan  { color: var(--cyan); }
+.panel-terminal .t-violet{ color: var(--violet2); }
+.panel-terminal .t-muted { color: #334155; }
+.panel-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;
+}
+.panel-stat {
+  padding: 10px 12px;
+  background: rgba(124,58,237,0.06);
+  border: 1px solid var(--border);
+}
+.panel-stat-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--violet2); display: block;
+}
+.panel-stat-label { font-size: 0.5rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+.hero-badge {
+  position: absolute;
+  padding: 6px 12px;
+  border: 1px solid;
+  font-size: 0.52rem; letter-spacing: 2px; text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  animation: floatBadge linear infinite alternate;
+}
+.hb-1 { top: -20px; right: 10px; color: var(--cyan); border-color: rgba(6,182,212,0.4); background: rgba(6,182,212,0.06); animation-duration: 3s; }
+.hb-2 { bottom: -10px; left: -20px; color: var(--violet2); border-color: rgba(167,139,250,0.4); background: rgba(124,58,237,0.06); animation-duration: 3.7s; }
+.hb-3 { top: 30%; right: 0px; color: var(--green); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.06); animation-duration: 4.2s; }
+@keyframes floatBadge { from { transform: translateY(-6px); } to { transform: translateY(6px); } }
+
+/* ── GENERIC SECTION ─────────────────────────────────────── */
+.section {
+  min-height: 100vh;
+  padding: 120px 8vw 80px;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  position: relative;
+  max-width: 1400px; margin: 0 auto;
+}
+
+.sec-eyebrow {
+  font-size: 0.58rem; letter-spacing: 6px;
+  color: var(--cyan); text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.sec-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 900; line-height: 1;
+  color: var(--text); margin-bottom: 16px;
+}
+.sec-title em {
+  color: transparent;
+  background: linear-gradient(135deg, var(--violet2), var(--cyan));
+  -webkit-background-clip: text; background-clip: text;
+  font-style: normal;
+}
+.sec-divider {
+  width: 40px; height: 1px;
+  background: linear-gradient(90deg, var(--violet), transparent);
+  margin-bottom: 60px;
+}
+
+/* ── REVEAL UTILITIES (set by JS, not CSS animation) ─────── */
+.reveal      { opacity: 0; transform: translateY(40px); }
+.reveal-left { opacity: 0; transform: translateX(-60px); }
+.reveal-right{ opacity: 0; transform: translateX(60px); }
+
+/* ── ABOUT ───────────────────────────────────────────────── */
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center;
+}
+@media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; gap: 48px; } }
+
+.about-large-text {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 900; line-height: 0.9;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(167,139,250,0.2);
+  margin-bottom: 32px;
+  user-select: none;
+}
+.about-tags {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 32px;
+}
+.about-tag {
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  font-size: 0.58rem; letter-spacing: 3px;
+  color: var(--muted); text-transform: uppercase;
+  transition: border-color 0.2s, color 0.2s;
+}
+.about-tag:hover { border-color: var(--cyan2); color: var(--cyan2); }
+.about-body { font-size: 0.78rem; color: var(--muted); line-height: 2; }
+.about-body p { margin-bottom: 20px; }
+.about-body strong { color: var(--text-soft); font-weight: 600; }
+.about-body em { color: var(--violet2); font-style: normal; }
+.about-facts {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  margin-top: 32px;
+}
+.about-fact {
+  padding: 16px; background: var(--surface);
+  border: 1px solid var(--border);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.about-fact:hover { border-color: rgba(124,58,237,0.4); box-shadow: var(--glow-v); }
+.fact-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.8rem; font-weight: 900;
+  color: var(--violet2); display: block;
+}
+.fact-label { font-size: 0.55rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+
+/* ── TECH STACK ──────────────────────────────────────────── */
+#stack { min-height: auto; padding: 100px 8vw; max-width: 1400px; margin: 0 auto; }
+.stack-intro {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; margin-bottom: 80px; align-items: end;
+}
+@media (max-width:768px) { .stack-intro { grid-template-columns:1fr; } }
+.stack-body { font-size:0.75rem; color:var(--muted); line-height:1.9; }
+
+.tech-universe {
+  display: flex; flex-direction: column; gap: 48px;
+}
+.tech-group { }
+.tech-group-label {
+  font-size: 0.55rem; letter-spacing: 5px;
+  color: var(--cyan); text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.tech-group-label::after {
+  content: ''; flex:1; height:1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+.tech-nodes { display: flex; flex-wrap: wrap; gap: 10px; }
+.tech-node {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 0.65rem; letter-spacing: 1px;
+  transition: all 0.3s var(--ease-out);
+  cursor: default;
+  position: relative; overflow: hidden;
+}
+.tech-node::before {
+  content: ''; position:absolute; inset:0;
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.tech-node:hover { border-color: var(--cyan); color: var(--cyan2); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(6,182,212,0.12); }
+.tech-node:hover::before { opacity: 1; }
+.tech-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* Root cause fix: #projects-outer must clip overflow so the 6×100vw track
+   never contributes to document scrollWidth. overflow:clip (not hidden) does
+   this without creating a scroll container. */
+#projects-outer {
+  position: relative;
+  z-index: 1;
+  overflow: clip;   /* ← clips the 600vw track without creating a scroll context */
+  width: 100%;
+}
+.projects-sticky {
+  position: sticky; top: 0;
+  height: 100vh;
+  overflow: hidden; /* clips track inside the sticky */
+  background: var(--bg);
+  width: 100%;      /* never wider than viewport */
+}
+.projects-track {
+  display: flex; height: 100%;
+  will-change: transform;
+  /* Do NOT set an explicit width — let flex children (100% each) define it.
+     The sticky overflow:hidden above clips it. */
+}
+.project-panel {
+  /* 100vw includes scrollbar width → overflow by ~17px on Windows.
+     Use min-width:100% relative to the sticky container instead. */
+  min-width: 100%;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 0 8vw;
+  gap: 60px;
+  position: relative;
+}
+@media (max-width: 900px) {
+  .project-panel { grid-template-columns: 1fr; padding: 80px 6vw; overflow-y: auto; }
+  .proj-visual-wrap { order: -1; }
+}
+
+/* Project panel counter */
+.proj-counter {
+  position: absolute; top: 40px; left: 8vw;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.55rem; letter-spacing: 4px;
+  color: var(--muted); text-transform: uppercase;
+}
+.proj-nav {
+  position: absolute; bottom: 40px; left: 8vw;
+  display: flex; gap: 8px;
+}
+.proj-pip {
+  width: 24px; height: 2px;
+  background: var(--muted);
+  transition: width 0.4s, background 0.4s;
+}
+.proj-pip.active { width: 48px; background: var(--cyan); }
+
+.proj-content { display:flex; flex-direction:column; }
+.proj-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 5rem; font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,0.06);
+  line-height: 1; margin-bottom: -20px;
+  user-select: none;
+}
+.proj-category {
+  font-size: 0.58rem; letter-spacing: 4px;
+  text-transform: uppercase; margin-bottom: 12px;
+}
+.proj-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.6rem, 3vw, 2.8rem);
+  font-weight: 900; line-height: 1;
+  color: var(--text); margin-bottom: 6px;
+}
+.proj-subtitle {
+  font-size: 0.65rem; color: var(--muted);
+  margin-bottom: 24px; font-style: italic;
+}
+.proj-desc {
+  font-size: 0.72rem; color: var(--muted);
+  line-height: 1.9; margin-bottom: 28px;
+  max-width: 480px;
+}
+.proj-pills { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:32px; }
+.proj-pill {
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  font-size: 0.58rem; letter-spacing: 1px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.proj-links { display:flex; gap:16px; flex-wrap: wrap; }
+.proj-link {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size: 0.65rem; letter-spacing: 2px; text-transform:uppercase;
+  text-decoration:none;
+  padding: 10px 24px;
+  border: 1px solid var(--border);
+  transition: all 0.25s var(--ease-out);
+}
+.proj-link:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: var(--glow-c); transform: translateY(-2px); }
+.proj-link.live { background: rgba(6,182,212,0.1); border-color: rgba(6,182,212,0.4); color: var(--cyan); }
+
+/* ── PROJECT VISUAL ──────────────────────────────────────── */
+.proj-visual-wrap {
+  perspective: 1000px;
+  cursor: none;
+}
+.proj-visual {
+  position: relative; height: 400px;
+  border: 1px solid;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: border-color 0.3s;
+  will-change: transform;
+}
+@media (max-width: 900px) { .proj-visual { height: 250px; } }
+.proj-visual-bg { position:absolute; inset:0; transition: transform 0.4s; }
+.proj-visual:hover .proj-visual-bg { transform: scale(1.03); }
+.proj-visual-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  padding: 24px; justify-content: flex-end;
+}
+.proj-visual-code {
+  font-size: 0.58rem; color: rgba(255,255,255,0.35); line-height: 1.8;
+  font-style: italic; margin-bottom: 16px;
+}
+.proj-live-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; width: fit-content;
+  background: rgba(6,182,212,0.12);
+  border: 1px solid rgba(6,182,212,0.35);
+  font-size: 0.52rem; letter-spacing: 3px;
+  color: var(--cyan); text-transform: uppercase;
+}
+.proj-live-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--cyan); animation: statusPulse 2s infinite;
+}
+
+/* Project visual backgrounds */
+.pv-faida   { background: radial-gradient(ellipse at 30% 30%, #0d2b0d 0%, #050f05 40%, #040608 100%); border-color: rgba(16,185,129,0.25); }
+.pv-barber  { background: radial-gradient(ellipse at 70% 30%, #1a0a3c 0%, #0a0520 40%, #040608 100%); border-color: rgba(124,58,237,0.3); }
+.pv-nova    { background: radial-gradient(ellipse at 50% 20%, #2a0a1e 0%, #0f0510 40%, #040608 100%); border-color: rgba(244,63,94,0.25); }
+.pv-spy     { background: radial-gradient(ellipse at 60% 40%, #2a1500 0%, #130800 40%, #040608 100%); border-color: rgba(249,115,22,0.25); }
+.pv-rawdati { background: radial-gradient(ellipse at 40% 60%, #0a1e1e 0%, #050f10 40%, #040608 100%); border-color: rgba(6,182,212,0.25); }
+.pv-pfe     { background: radial-gradient(ellipse at 30% 50%, #0a1428 0%, #050810 40%, #040608 100%); border-color: rgba(99,102,241,0.25); }
+
+/* Floating UI elements in visuals */
+.proj-float {
+  position: absolute;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  padding: 8px 12px;
+  font-size: 0.5rem; color: rgba(255,255,255,0.4);
+  letter-spacing: 2px; text-transform: uppercase;
+  animation: floatBadge linear infinite alternate;
+}
+.pf1 { top:16px; left:16px; animation-duration: 3.2s; }
+.pf2 { top:16px; right:16px; animation-duration: 4.1s; }
+.pf3 { top:50%; left:16px; transform: translateY(-50%); animation-duration: 3.7s; }
+
+/* ── PROJECTS MOBILE FALLBACK ───────────────────────────── */
+@media (max-width: 900px) {
+  #projects-outer { height: auto !important; overflow: clip; }
+  .projects-sticky { position: static; height: auto; overflow: visible; }
+  .projects-track { flex-direction: column; transform: none !important; width: 100%; }
+  .project-panel { width: 100%; min-width: 0; height: auto; min-height: 100vh; }
+}
+
+/* ── ACTIVITY SECTION ─────────────────────────────────────────────── */
+#activity {
+  min-height: auto;
+  padding: 100px 8vw;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 5;
+  background: var(--bg);
+}
+
+/* Intro row */
+.act-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+  margin-bottom: 64px;
+}
+@media (max-width:900px) { .act-intro { grid-template-columns:1fr; gap:40px; } }
+.activity-desc { font-size:0.75rem; color:var(--muted); line-height:1.9; }
+.activity-desc strong { color:var(--text-soft); }
+.activity-desc em { color:var(--violet2); font-style:normal; }
+
+/* Key metrics row */
+.act-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 0;
+}
+@media (max-width:1024px) { .act-metrics { grid-template-columns: repeat(2,1fr); } }
+@media (max-width:600px)  { .act-metrics { grid-template-columns: 1fr 1fr; } }
+.act-metric {
+  padding: 20px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 6px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.act-metric:hover { border-color: rgba(124,58,237,0.45); box-shadow: 0 0 30px rgba(124,58,237,0.1); }
+.act-metric-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.6rem; font-weight: 900;
+  color: var(--violet2); line-height: 1;
+}
+.act-metric-label { font-size: 0.55rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+
+/* Stats cards grid */
+.act-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+@media (max-width:768px) { .act-cards { grid-template-columns: 1fr; } }
+.act-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 4px;
+  overflow: hidden;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  position: relative;
+}
+.act-card:hover { border-color: rgba(124,58,237,0.4); box-shadow: 0 0 40px rgba(124,58,237,0.08); }
+.act-card img {
+  width: 100%; display: block;
+  /* Blend dark backgrounds from external cards */
+  border-radius: 0;
+}
+.act-card-label {
+  font-size: 0.5rem; letter-spacing: 3px;
+  color: var(--muted); text-transform: uppercase;
+  padding: 6px 10px 2px;
+}
+
+/* Full-width cards */
+.act-card-full {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  transition: border-color 0.25s;
+}
+.act-card-full:hover { border-color: rgba(6,182,212,0.35); }
+.act-card-full img { width: 100%; display: block; }
+
+/* Snake row */
+.act-snake {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 20px 20px 12px;
+  overflow: hidden;
+}
+.act-snake-label {
+  font-size: 0.5rem; letter-spacing: 4px;
+  color: var(--cyan); text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.act-snake-label::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--cyan); box-shadow: 0 0 8px var(--cyan);
+  animation: statusPulse 2s infinite;
+}
+.act-snake img { width: 100%; display: block; }
+.act-snake-fallback {
+  padding: 24px 0;
+  text-align: center;
+  font-size: 0.62rem; letter-spacing: 2px; color: var(--muted);
+  line-height: 1.9;
+}
+.act-snake-fallback a { color: var(--violet2); text-decoration: none; }
+.act-snake-fallback a:hover { text-decoration: underline; }
+
+
+
+/* ── ALL PROJECTS GRID ──────────────────────────────── */
+#all-projects {
+  padding: 100px 8vw 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 5;
+  background: var(--bg);
+}
+.all-proj-filters {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-bottom: 48px;
+}
+.apf-btn {
+  padding: 7px 18px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase;
+  cursor: none; transition: all 0.2s;
+}
+.apf-btn:hover, .apf-btn.active {
+  border-color: var(--cyan); color: var(--cyan);
+}
+.all-proj-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 1024px) { .all-proj-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .all-proj-grid { grid-template-columns: 1fr; } }
+.ap-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 24px;
+  display: flex; flex-direction: column; gap: 12px;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+  position: relative; overflow: hidden;
+}
+.ap-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, var(--violet), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.ap-card:hover {
+  border-color: rgba(124,58,237,0.4);
+  box-shadow: 0 0 40px rgba(124,58,237,0.08);
+  transform: translateY(-3px);
+}
+.ap-card:hover::before { opacity: 1; }
+.ap-card.featured { border-color: rgba(124,58,237,0.3); }
+.ap-card.featured::before { opacity: 1; }
+.ap-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ap-card-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.6rem; color: var(--muted); letter-spacing: 2px;
+}
+.ap-card-type {
+  font-size: 0.48rem; letter-spacing: 2px; text-transform: uppercase;
+  padding: 3px 8px; border: 1px solid;
+}
+.ap-card-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.88rem; font-weight: 700;
+  color: var(--text); line-height: 1.2;
+}
+.ap-card-desc {
+  font-size: 0.65rem; color: var(--muted);
+  line-height: 1.8; flex: 1;
+}
+.ap-card-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+.ap-card-pill {
+  font-size: 0.5rem; letter-spacing: 1px;
+  padding: 3px 8px; border: 1px solid var(--border); color: var(--muted);
+}
+.ap-card-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.ap-link {
+  font-size: 0.58rem; letter-spacing: 1px;
+  color: var(--muted); text-decoration: none;
+  transition: color 0.2s;
+}
+.ap-link:hover { color: var(--cyan); }
+.ap-link.live { color: var(--cyan); }
+.ap-featured-badge {
+  position: absolute; top: 12px; right: 12px;
+  font-size: 0.45rem; letter-spacing: 2px;
+  color: var(--violet2);
+  border: 1px solid rgba(124,58,237,0.3);
+  padding: 2px 6px;
+}
+
+/* ── CONTACT SECTION ─────────────────────────────────────── */
+#contact {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: flex-start;
+  padding: 120px 8vw;
+  position: relative;
+  z-index: 5;
+  background: var(--bg);
+  max-width: 1400px; margin: 0 auto;
+}
+.contact-big {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(2rem, 6vw, 5.5rem);
+  font-weight: 900; line-height: 0.9;
+  color: var(--text); margin-bottom: 8px;
+}
+.contact-big em {
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(167,139,250,0.3);
+  font-style: normal;
+}
+.contact-sub {
+  font-size: 0.75rem; color: var(--muted);
+  margin: 24px 0 48px; max-width: 480px; line-height: 1.9;
+}
+.contact-links { display:flex; flex-direction:column; gap:12px; max-width: 520px; }
+.c-link {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 16px 20px;
+  background: var(--surface); border: 1px solid var(--border);
+  text-decoration:none; color: var(--muted);
+  font-size: 0.7rem; letter-spacing:1px;
+  transition: all 0.25s var(--ease-out);
+}
+.c-link:hover { border-color: var(--cyan); color: var(--text); box-shadow: var(--glow-c); transform: translateX(8px); }
+.c-link-right { font-size: 0.55rem; letter-spacing:3px; color: var(--muted); }
+.c-link:hover .c-link-right { color: var(--cyan); }
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+footer {
+  padding: 40px 8vw;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.58rem; letter-spacing: 2px;
+  color: var(--muted);
+  position: relative; z-index: 1;
+}
+footer a { color: var(--violet2); text-decoration: none; }
+@media (max-width:600px) { footer { flex-direction:column; gap:12px; text-align:center; } }
+
+/* ── PROJECT MODAL ───────────────────────────────────────── */
+#modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(4,6,8,0.9);
+  backdrop-filter: blur(12px);
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.4s, visibility 0.4s;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+#modal-overlay.open { opacity:1; visibility:visible; }
+.modal-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  max-width: 720px; width: 100%;
+  max-height: 85vh; overflow-y: auto;
+  padding: 48px;
+  transform: translateY(40px);
+  transition: transform 0.4s var(--ease-out);
+  position: relative;
+}
+#modal-overlay.open .modal-box { transform: translateY(0); }
+.modal-close {
+  position: absolute; top: 20px; right: 20px;
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  background: transparent; cursor: none;
+  color: var(--muted); font-size: 1rem;
+  display:flex; align-items:center; justify-content:center;
+  transition: border-color 0.2s, color 0.2s;
+}
+.modal-close:hover { border-color: var(--rose); color: var(--rose); }
+.modal-num { font-family:'Orbitron',monospace; font-size:4rem; font-weight:900; color:transparent; -webkit-text-stroke:1px rgba(255,255,255,0.05); line-height:1; }
+.modal-title { font-family:'Orbitron',monospace; font-size:1.8rem; font-weight:900; color:var(--text); margin-bottom:8px; }
+.modal-sub { font-size:0.65rem; color:var(--muted); font-style:italic; margin-bottom:24px; }
+.modal-section-title { font-size:0.58rem; letter-spacing:4px; text-transform:uppercase; color:var(--cyan); margin-bottom:12px; margin-top:28px; }
+.modal-desc { font-size:0.72rem; color:var(--muted); line-height:1.9; }
+.modal-pills { display:flex; flex-wrap:wrap; gap:8px; }
+.modal-pill { padding:4px 12px; border:1px solid var(--border); font-size:0.6rem; color:var(--violet2); }
+.modal-links { display:flex; gap:12px; flex-wrap:wrap; margin-top:32px; }
+</style>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">AY</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div class="loader-label">Initializing Digital Lab</div>
+</div>
+
+<!-- CURSOR -->
+<div id="cur">
+  <div id="cur-dot"></div>
+  <div id="cur-ring"></div>
+</div>
+
+<!-- SCROLL PROGRESS -->
+<div id="progress"></div>
+
+<!-- PROJECT MODAL -->
+<div id="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal-box" id="modal-content">
+    <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">AY<span>.</span>DEV</a>
+  <ul class="nav-links">
+    <li><a href="#hero" data-section="hero">Home</a></li>
+    <li><a href="#about" data-section="about">About</a></li>
+    <li><a href="#stack" data-section="stack">Stack</a></li>
+    <li><a href="#projects-outer" data-section="projects-outer">Projects</a></li>
+    <li><a href="#activity" data-section="activity">Activity</a></li>
+    <li><a href="#contact" data-section="contact">Contact</a></li>
+  </ul>
+  <a href="mailto:seosolutions172@gmail.com" class="nav-cta">Hire Me</a>
+</nav>
+
+<!-- THREE.JS BACKGROUND -->
+<canvas id="bg"></canvas>
+
+<main>
+
+<!-- ══════════════════════════ HERO ══════════════════════════ -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-status">
+      <div class="hero-status-dot"></div>
+      Available to Build
+    </div>
+    <h1 class="hero-name">
+      Ahmed<br/><em>Yasser</em>
+    </h1>
+    <div class="hero-role">
+      <strong>Mobile Engineer</strong> &nbsp;·&nbsp; Full-Stack Developer &nbsp;·&nbsp; AI Integrator
+    </div>
+    <p class="hero-statement">
+      I build complete, deployed systems — not prototypes.<br/>
+      React Native · NestJS · Next.js · Gemini · Three.js<br/>
+      30+ shipped. 3 live. Algeria 🇩🇿
+    </p>
+    <div class="hero-ctas">
+      <a href="#projects-outer" class="btn btn-primary">View Projects</a>
+      <a href="#contact" class="btn btn-ghost">Get in Touch</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-panel">
+      <div class="hero-panel-card main">
+        <div class="panel-terminal">
+          <div><span class="t-muted">// developer.config.js</span></div>
+          <div><span class="t-cyan">const</span> <span class="t-violet">dev</span> = {</div>
+          <div>&nbsp; name: <span class="t-green">"Ahmed Yasser"</span>,</div>
+          <div>&nbsp; base: <span class="t-green">"Algeria 🇩🇿"</span>,</div>
+          <div>&nbsp; focus: <span class="t-green">"Mobile + AI"</span>,</div>
+          <div>&nbsp; shipped: <span class="t-cyan">30</span><span class="t-muted">+</span>,</div>
+          <div>&nbsp; status: <span class="t-green">"AVAILABLE"</span></div>
+          <div>}</div>
+        </div>
+        <div class="panel-stats">
+          <div class="panel-stat">
+            <span class="panel-stat-num">30+</span>
+            <span class="panel-stat-label">Projects</span>
+          </div>
+          <div class="panel-stat">
+            <span class="panel-stat-num">3</span>
+            <span class="panel-stat-label">Live Deploys</span>
+          </div>
+          <div class="panel-stat">
+            <span class="panel-stat-num">10+</span>
+            <span class="panel-stat-label">Tech Stack</span>
+          </div>
+          <div class="panel-stat">
+            <span class="panel-stat-num">5+</span>
+            <span class="panel-stat-label">Yrs Exp</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-badge hb-1">React Native</div>
+      <div class="hero-badge hb-2">NestJS · Next.js</div>
+      <div class="hero-badge hb-3">AI Integrator</div>
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ ABOUT ══════════════════════════ -->
+<section id="about" class="section">
+  <div class="sec-eyebrow reveal">/ 01 — Identity</div>
+  <div class="about-grid">
+    <div class="reveal-left">
+      <div class="about-large-text">WHO<br/>AM<br/>I?</div>
+      <div class="about-tags">
+        <span class="about-tag">Mobile</span>
+        <span class="about-tag">Full-Stack</span>
+        <span class="about-tag">AI</span>
+        <span class="about-tag">Three.js</span>
+        <span class="about-tag">Arabic RTL</span>
+        <span class="about-tag">Real-Time</span>
+        <span class="about-tag">Monorepo</span>
+      </div>
+    </div>
+    <div class="reveal-right">
+      <div class="about-body">
+        <p>I'm a developer from <strong>Algeria</strong> who builds complete systems. Not UI demos. Not skeleton repos. <em>Products</em> — with backends, databases, auth, deployments, and real users.</p>
+        <p>My work spans every layer: the React Native screen the user touches, the NestJS API handling requests, the Supabase database storing results, the Docker container running it all.</p>
+        <p>I build for <strong>Arabic-speaking users</strong> when the project calls for it — RTL, localization, and cultural UX are first-class concerns in my work, not afterthoughts.</p>
+        <p>AI isn't a demo for me. <strong>Nova AI</strong> processes real documents with OCR. <strong>Brain Arena</strong> uses LLM APIs as its game engine. That's infrastructure thinking.</p>
+      </div>
+      <div class="about-facts">
+        <div class="about-fact">
+          <span class="fact-num" data-count="30">0</span>
+          <span class="fact-label">Projects+</span>
+        </div>
+        <div class="about-fact">
+          <span class="fact-num" data-count="3">0</span>
+          <span class="fact-label">Live Deploys</span>
+        </div>
+        <div class="about-fact">
+          <span class="fact-num" data-count="5">0</span>
+          <span class="fact-label">Years Exp+</span>
+        </div>
+        <div class="about-fact">
+          <span class="fact-num" data-count="10">0</span>
+          <span class="fact-label">Tech Stack</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ STACK ══════════════════════════ -->
+<section id="stack">
+  <div class="stack-intro">
+    <div>
+      <div class="sec-eyebrow reveal">/ 02 — Technology</div>
+      <h2 class="sec-title reveal">My <em>Universe</em></h2>
+      <div class="sec-divider reveal"></div>
+    </div>
+    <div class="stack-body reveal-right">
+      Every technology I list here is backed by a real shipped project.<br/>
+      No tutorial completions. No YouTube follows.
+    </div>
+  </div>
+  <div class="tech-universe reveal">
+    <div class="tech-group">
+      <div class="tech-group-label">Mobile &amp; Cross-Platform</div>
+      <div class="tech-nodes">
+        <div class="tech-node"><div class="tech-dot" style="background:#61DAFB"></div>React Native</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#000"></div>Expo + EAS Build</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#02569B"></div>Flutter + Dart</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#7F52FF"></div>Android / Kotlin</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#61DAFB"></div>Expo Router</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#FF4154"></div>TanStack Query</div>
+      </div>
+    </div>
+    <div class="tech-group">
+      <div class="tech-group-label">Web &amp; Backend</div>
+      <div class="tech-nodes">
+        <div class="tech-node"><div class="tech-dot" style="background:#E0234E"></div>NestJS</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#000"></div>Next.js</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#61DAFB"></div>React 18</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#3178C6"></div>TypeScript</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#F7DF1E"></div>JavaScript</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#38B2AC"></div>TailwindCSS</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#646CFF"></div>Vite</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#000"></div>Three.js</div>
+      </div>
+    </div>
+    <div class="tech-group">
+      <div class="tech-group-label">Data &amp; Cloud</div>
+      <div class="tech-nodes">
+        <div class="tech-node"><div class="tech-dot" style="background:#3ECF8E"></div>Supabase</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#FFCA28"></div>Firebase</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#47A248"></div>MongoDB</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#4479A1"></div>MySQL / SQLite</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#336791"></div>PostgreSQL + PostGIS</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#2496ED"></div>Docker</div>
+      </div>
+    </div>
+    <div class="tech-group">
+      <div class="tech-group-label">AI &amp; Creative</div>
+      <div class="tech-nodes">
+        <div class="tech-node"><div class="tech-dot" style="background:#4285F4"></div>Google Gemini</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#412991"></div>OpenAI API</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#8957e5"></div>OpenRouter</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#FF6B35"></div>Tesseract OCR</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#199900"></div>Leaflet Maps</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#764ABC"></div>Zustand</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#FF7849"></div>Lottie</div>
+        <div class="tech-node"><div class="tech-dot" style="background:#0081CB"></div>Socket.io</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ PROJECTS ══════════════════════════ -->
+<div id="projects-outer">
+  <div class="projects-sticky">
+    <div class="projects-track" id="projects-track">
+
+      <!-- ── PROJECT 01: FAIDA ── -->
+      <div class="project-panel" data-project="0">
+        <div class="proj-counter">01 / 06 — Web Platform</div>
+        <div class="proj-nav" id="proj-pips">
+          <div class="proj-pip active"></div><div class="proj-pip"></div>
+          <div class="proj-pip"></div><div class="proj-pip"></div>
+          <div class="proj-pip"></div><div class="proj-pip"></div>
+        </div>
+        <div class="proj-content">
+          <div class="proj-num">01</div>
+          <div class="proj-category" style="color:#10b981">Web Platform · Arabic RTL</div>
+          <h2 class="proj-title">Faida Platform</h2>
+          <div class="proj-subtitle">منصة الفائدة — Agricultural Enterprise</div>
+          <p class="proj-desc">Arabic RTL agricultural management platform — 5 user roles (Admin, Provider, Farmer, Driver, Citizen). Interactive Leaflet maps for field tracking, Recharts analytics dashboards, PDF/Excel export, Framer Motion animations, TanStack Query, Zod validation.</p>
+          <div class="proj-pills">
+            <span class="proj-pill" style="color:#10b981;border-color:rgba(16,185,129,0.3)">React 18</span>
+            <span class="proj-pill">TypeScript</span>
+            <span class="proj-pill">Vite</span>
+            <span class="proj-pill">TailwindCSS</span>
+            <span class="proj-pill">Zustand</span>
+            <span class="proj-pill">Leaflet</span>
+            <span class="proj-pill">Recharts</span>
+          </div>
+          <div class="proj-links">
+            <a href="https://faida-platform.vercel.app" target="_blank" rel="noopener" class="proj-link live">Live Demo ↗</a>
+            <button class="proj-link btn-ghost" data-modal="0">Details →</button>
+          </div>
+        </div>
+        <div class="proj-visual-wrap">
+          <div class="proj-visual pv-faida" id="pv-0">
+            <div class="proj-visual-bg pv-faida"></div>
+            <div class="proj-float pf1">Map View</div>
+            <div class="proj-float pf2">5 Roles</div>
+            <div class="proj-float pf3">Analytics</div>
+            <div class="proj-visual-overlay">
+              <div class="proj-visual-code">// Agricultural RTL Enterprise SPA<br/>// React 18 + Vite + Leaflet + Recharts</div>
+              <div class="proj-live-badge"><div class="proj-live-dot"></div>faida-platform.vercel.app</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROJECT 02: BARBER ── -->
+      <div class="project-panel" data-project="1">
+        <div class="proj-counter">02 / 06 — Full-Stack Monorepo</div>
+        <div class="proj-visual-wrap">
+          <div class="proj-visual pv-barber" id="pv-1">
+            <div class="proj-visual-bg pv-barber"></div>
+            <div class="proj-float pf1">Booking</div>
+            <div class="proj-float pf2">PostGIS</div>
+            <div class="proj-float pf3">Real-Time</div>
+            <div class="proj-visual-overlay">
+              <div class="proj-visual-code">// React Native + NestJS + Next.js<br/>// PostGIS geo-search · Docker on Render</div>
+            </div>
+          </div>
+        </div>
+        <div class="proj-content">
+          <div class="proj-num">02</div>
+          <div class="proj-category" style="color:#a78bfa">Monorepo · Mobile + Web + API</div>
+          <h2 class="proj-title">BarberDZ</h2>
+          <div class="proj-subtitle">7afefli — Salon Booking Ecosystem</div>
+          <p class="proj-desc">Full-stack salon booking monorepo: React Native client, Next.js admin dashboard, NestJS REST API. PostGIS geo-location search, real-time booking updates, photo portfolios, k6 load testing, Docker deployment on Render.</p>
+          <div class="proj-pills">
+            <span class="proj-pill" style="color:#a78bfa;border-color:rgba(167,139,250,0.3)">React Native</span>
+            <span class="proj-pill">NestJS</span>
+            <span class="proj-pill">Next.js</span>
+            <span class="proj-pill">Supabase</span>
+            <span class="proj-pill">PostGIS</span>
+            <span class="proj-pill">Docker</span>
+          </div>
+          <div class="proj-links">
+            <a href="https://github.com/Ahmedyasser1905" target="_blank" rel="noopener" class="proj-link">GitHub ↗</a>
+            <button class="proj-link btn-ghost" data-modal="1">Details →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROJECT 03: NOVA AI ── -->
+      <div class="project-panel" data-project="2">
+        <div class="proj-counter">03 / 06 — AI Application</div>
+        <div class="proj-content">
+          <div class="proj-num">03</div>
+          <div class="proj-category" style="color:#f43f5e">AI Integration · Multi-Model</div>
+          <h2 class="proj-title">Nova AI</h2>
+          <div class="proj-subtitle">Multi-Model Document Intelligence</div>
+          <p class="proj-desc">AI assistant that processes real documents. Upload a file → Tesseract OCR extracts text → PDF parsing → AI response from Gemini or OpenAI. Express backend with JWT auth, MongoDB, Docker, deployed on Render.</p>
+          <div class="proj-pills">
+            <span class="proj-pill" style="color:#f43f5e;border-color:rgba(244,63,94,0.3)">React Native</span>
+            <span class="proj-pill">Gemini</span>
+            <span class="proj-pill">OpenAI</span>
+            <span class="proj-pill">Express</span>
+            <span class="proj-pill">MongoDB</span>
+            <span class="proj-pill">Docker</span>
+            <span class="proj-pill">Tesseract</span>
+          </div>
+          <div class="proj-links">
+            <a href="https://github.com/Ahmedyasser1905" target="_blank" rel="noopener" class="proj-link">GitHub ↗</a>
+            <button class="proj-link btn-ghost" data-modal="2">Details →</button>
+          </div>
+        </div>
+        <div class="proj-visual-wrap">
+          <div class="proj-visual pv-nova" id="pv-2">
+            <div class="proj-visual-bg pv-nova"></div>
+            <div class="proj-float pf1">OCR</div>
+            <div class="proj-float pf2">Gemini</div>
+            <div class="proj-float pf3">OpenAI</div>
+            <div class="proj-visual-overlay">
+              <div class="proj-visual-code">// Tesseract → PDF parse → LLM response<br/>// Gemini + OpenAI · Express + MongoDB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROJECT 04: SPY ── -->
+      <div class="project-panel" data-project="3">
+        <div class="proj-counter">04 / 06 — 3D Mobile Game</div>
+        <div class="proj-visual-wrap">
+          <div class="proj-visual pv-spy" id="pv-3">
+            <div class="proj-visual-bg pv-spy"></div>
+            <div class="proj-float pf1">Three.js</div>
+            <div class="proj-float pf2">Expo GL</div>
+            <div class="proj-float pf3">Arabic</div>
+            <div class="proj-visual-overlay">
+              <div class="proj-visual-code">// 3D scenes via expo-gl + Three.js<br/>// Spatial audio · Haptic feedback</div>
+              <div class="proj-live-badge"><div class="proj-live-dot" style="background:#f97316;box-shadow:0 0 8px #f97316"></div>com.spygame.dz</div>
+            </div>
+          </div>
+        </div>
+        <div class="proj-content">
+          <div class="proj-num">04</div>
+          <div class="proj-category" style="color:#f97316">Mobile Game · Three.js</div>
+          <h2 class="proj-title">SPY الجاسوس</h2>
+          <div class="proj-subtitle">Spyfall Party Game v2.0</div>
+          <p class="proj-desc">Spyfall-style party word game with Three.js 3D scenes rendered via expo-gl. Multi-language Arabic support with i18next, haptic feedback, spatial audio, Zustand state management. Published as com.spygame.dz via EAS Build.</p>
+          <div class="proj-pills">
+            <span class="proj-pill" style="color:#f97316;border-color:rgba(249,115,22,0.3)">React Native</span>
+            <span class="proj-pill">Three.js</span>
+            <span class="proj-pill">Expo GL</span>
+            <span class="proj-pill">i18next</span>
+            <span class="proj-pill">Zustand</span>
+            <span class="proj-pill">EAS Build</span>
+          </div>
+          <div class="proj-links">
+            <a href="https://github.com/Ahmedyasser1905" target="_blank" rel="noopener" class="proj-link">GitHub ↗</a>
+            <button class="proj-link btn-ghost" data-modal="3">Details →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROJECT 05: RAWDATI ── -->
+      <div class="project-panel" data-project="4">
+        <div class="proj-counter">05 / 06 — Mobile App</div>
+        <div class="proj-content">
+          <div class="proj-num">05</div>
+          <div class="proj-category" style="color:#06b6d4">Mobile · Arabic RTL · Firebase</div>
+          <h2 class="proj-title">Rawdati</h2>
+          <div class="proj-subtitle">روضتي — Nursery Parent-Educator Platform</div>
+          <p class="proj-desc">Arabic RTL nursery communication mobile app connecting parents and educators. Firebase Auth, Firestore, Storage, Cloud Functions. Push notifications, child activity tracking, Lottie animations, full RTL design.</p>
+          <div class="proj-pills">
+            <span class="proj-pill" style="color:#06b6d4;border-color:rgba(6,182,212,0.3)">React Native</span>
+            <span class="proj-pill">Firebase</span>
+            <span class="proj-pill">Zustand</span>
+            <span class="proj-pill">Arabic RTL</span>
+            <span class="proj-pill">Lottie</span>
+            <span class="proj-pill">Push Notifs</span>
+          </div>
+          <div class="proj-links">
+            <a href="https://rawdha.vercel.app" target="_blank" rel="noopener" class="proj-link live">Live Demo ↗</a>
+            <a href="https://github.com/Ahmedyasser1905/Rawdha" target="_blank" rel="noopener" class="proj-link">GitHub ↗</a>
+            <button class="proj-link btn-ghost" data-modal="4">Details →</button>
+          </div>
+        </div>
+        <div class="proj-visual-wrap">
+          <div class="proj-visual pv-rawdati" id="pv-4">
+            <div class="proj-visual-bg pv-rawdati"></div>
+            <div class="proj-float pf1">Firebase</div>
+            <div class="proj-float pf2">RTL</div>
+            <div class="proj-float pf3">Lottie</div>
+            <div class="proj-visual-overlay">
+              <div class="proj-visual-code">// Full Firebase suite · Arabic RTL<br/>// Firestore + Auth + Storage + Functions</div>
+              <div class="proj-live-badge"><div class="proj-live-dot"></div>rawdha.vercel.app</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROJECT 06: PFE ── -->
+      <div class="project-panel" data-project="5">
+        <div class="proj-counter">06 / 06 — Graduation Ecosystem</div>
+        <div class="proj-visual-wrap">
+          <div class="proj-visual pv-pfe" id="pv-5">
+            <div class="proj-visual-bg pv-pfe"></div>
+            <div class="proj-float pf1">NestJS API</div>
+            <div class="proj-float pf2">Flutter</div>
+            <div class="proj-float pf3">Offline-First</div>
+            <div class="proj-visual-overlay">
+              <div class="proj-visual-code">// API · Mobile · Desktop — one domain<br/>// NestJS + React Native + Flutter</div>
+              <div class="proj-live-badge"><div class="proj-live-dot" style="background:#6366f1;box-shadow:0 0 8px #6366f1"></div>pfe-backend-tau.vercel.app</div>
+            </div>
+          </div>
+        </div>
+        <div class="proj-content">
+          <div class="proj-num">06</div>
+          <div class="proj-category" style="color:#6366f1">Graduation · 3-Platform Ecosystem</div>
+          <h2 class="proj-title">PFE</h2>
+          <div class="proj-subtitle">Smart Construction Ecosystem</div>
+          <p class="proj-desc">Graduation project spanning three platforms: NestJS API (live on Vercel), React Native offline app (SQLite + Skia + Zustand), Flutter estimator (PDF export, Riverpod, fl_chart). One complete engineering domain.</p>
+          <div class="proj-pills">
+            <span class="proj-pill" style="color:#6366f1;border-color:rgba(99,102,241,0.3)">NestJS</span>
+            <span class="proj-pill">TypeScript</span>
+            <span class="proj-pill">React Native</span>
+            <span class="proj-pill">Flutter</span>
+            <span class="proj-pill">SQLite</span>
+            <span class="proj-pill">Vercel</span>
+          </div>
+          <div class="proj-links">
+            <a href="https://pfe-backend-tau.vercel.app" target="_blank" rel="noopener" class="proj-link live">Live API ↗</a>
+            <a href="https://github.com/Ahmedyasser1905/PFE1" target="_blank" rel="noopener" class="proj-link">GitHub ↗</a>
+            <button class="proj-link btn-ghost" data-modal="5">Details →</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /projects-track -->
+  </div><!-- /projects-sticky -->
+</div><!-- /projects-outer -->
+
+<!-- ══════════════════════════ ALL PROJECTS ══════════════════════════ -->
+<section id="all-projects">
+  <div class="sec-eyebrow reveal">/ 04 — All Systems</div>
+  <h2 class="sec-title reveal">Every <em>Project</em></h2>
+  <div class="sec-divider reveal"></div>
+  <div class="all-proj-filters reveal" id="proj-filters">
+    <button class="apf-btn active" data-filter="all">All (30)</button>
+    <button class="apf-btn" data-filter="mobile">Mobile</button>
+    <button class="apf-btn" data-filter="web">Web</button>
+    <button class="apf-btn" data-filter="flutter">Flutter</button>
+    <button class="apf-btn" data-filter="ai">AI</button>
+    <button class="apf-btn" data-filter="game">Game</button>
+    <button class="apf-btn" data-filter="tool">Tool</button>
+  </div>
+  <div class="all-proj-grid reveal" id="all-proj-grid">
+    <!-- Rendered by JS -->
+  </div>
+</section>
+
+<!-- ══════════════════════════ ACTIVITY ══════════════════════════ -->
+<section id="activity">
+
+  <div class="sec-eyebrow reveal">/ 04 — Open Source</div>
+  <h2 class="sec-title reveal">GitHub <em>Activity</em></h2>
+  <div class="sec-divider reveal"></div>
+
+  <!-- INTRO + METRICS ───────────────────────────────────────── -->
+  <div class="act-intro">
+    <div class="reveal-left">
+      <p class="activity-desc">
+        Every commit is a record of something <strong>shipped</strong> — not studied, not cloned, not followed along.<br/><br/>
+        My GitHub reflects <em>real product engineering</em>: mobile apps pushed via EAS Build, APIs deployed live to Vercel, AI integrations tested in production, games published on app stores.<br/><br/>
+        This section is always live — it pulls directly from GitHub's APIs and updates automatically. The stats you see reflect my real account, right now.
+      </p>
+      <a href="https://github.com/Ahmedyasser1905" target="_blank" rel="noopener"
+         class="btn btn-ghost" style="margin-top:28px;display:inline-flex">
+        View GitHub Profile ↗
+      </a>
+    </div>
+    <div class="reveal-right">
+      <div class="act-metrics">
+        <div class="act-metric">
+          <span class="act-metric-num">30+</span>
+          <span class="act-metric-label">Total Projects</span>
+        </div>
+        <div class="act-metric">
+          <span class="act-metric-num">3</span>
+          <span class="act-metric-label">Live Deploys</span>
+        </div>
+        <div class="act-metric">
+          <span class="act-metric-num">TS</span>
+          <span class="act-metric-label">Primary Lang</span>
+        </div>
+        <div class="act-metric">
+          <span class="act-metric-num">🇩🇿</span>
+          <span class="act-metric-label">Algeria</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE STATS CARDS ─────────────────────────────────────── -->
+  <div class="reveal">
+
+    <!-- Row 1: GitHub Stats + Streak side by side -->
+    <div class="act-cards" style="margin-bottom:16px">
+      <div class="act-card">
+        <div class="act-card-label">GitHub Stats</div>
+        <img
+          src="https://github-readme-stats.vercel.app/api?username=Ahmedyasser1905&show_icons=true&count_private=true&theme=tokyonight&hide_border=true&bg_color=080d18&title_color=a78bfa&icon_color=06b6d4&text_color=94a3b8&ring_color=7c3aed&border_radius=0&include_all_commits=true"
+          alt="Ahmed Yasser GitHub Stats"
+          loading="lazy"
+        />
+      </div>
+      <div class="act-card">
+        <div class="act-card-label">Contribution Streak</div>
+        <img
+          src="https://streak-stats.demolab.com?user=Ahmedyasser1905&theme=tokyonight&hide_border=true&background=080d18&stroke=7c3aed&ring=a78bfa&fire=f43f5e&currStreakLabel=a78bfa&sideLabels=94a3b8&dates=475569&border_radius=0"
+          alt="Ahmed Yasser GitHub Streak"
+          loading="lazy"
+        />
+      </div>
+    </div>
+
+    <!-- Row 2: Top Languages + Trophies side by side -->
+    <div class="act-cards" style="margin-bottom:16px">
+      <div class="act-card">
+        <div class="act-card-label">Top Languages</div>
+        <img
+          src="https://github-readme-stats.vercel.app/api/top-langs/?username=Ahmedyasser1905&layout=compact&count_private=true&theme=tokyonight&hide_border=true&bg_color=080d18&title_color=a78bfa&text_color=94a3b8&langs_count=8&border_radius=0"
+          alt="Ahmed Yasser Top Languages"
+          loading="lazy"
+        />
+      </div>
+      <div class="act-card">
+        <div class="act-card-label">GitHub Trophies</div>
+        <img
+          src="https://github-profile-trophy.vercel.app/?username=Ahmedyasser1905&theme=tokyonight&no-frame=true&no-bg=true&margin-w=4&column=3&rank=-C"
+          alt="Ahmed Yasser GitHub Trophies"
+          loading="lazy"
+          style="background:#080d18;padding:8px"
+        />
+      </div>
+    </div>
+
+    <!-- Row 3: Activity Graph full width -->
+    <div class="act-card-full">
+      <div class="act-card-label" style="padding:8px 10px 4px">Contribution Activity Graph</div>
+      <img
+        src="https://github-readme-activity-graph.vercel.app/graph?username=Ahmedyasser1905&theme=tokyo-night&bg_color=080d18&color=a78bfa&line=7c3aed&point=06b6d4&area=true&area_color=1e0a3c&hide_border=true&radius=0"
+        alt="Ahmed Yasser Contribution Activity Graph"
+        loading="lazy"
+      />
+    </div>
+
+    <!-- Row 4: Contribution Snake -->
+    <div class="act-snake">
+      <div class="act-snake-label">Live Contribution Snake — auto-refreshes every 12h via GitHub Actions</div>
+      <img
+        src="https://raw.githubusercontent.com/Ahmedyasser1905/Ahmedyasser1905/output/github-contribution-grid-snake-purple.svg"
+        alt="GitHub contribution snake animation — Ahmedyasser1905"
+        loading="lazy"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"
+      />
+      <div class="act-snake-fallback" style="display:none">
+        Snake animation generates automatically once the GitHub Action runs.<br/>
+        <a href="https://github.com/Ahmedyasser1905/Ahmedyasser1905/actions" target="_blank" rel="noopener">→ Go to Actions → Run &quot;Generate Contribution Snake&quot; manually</a><br/><br/>
+        <span style="font-size:0.55rem;color:#334155">After running, this SVG appears automatically and refreshes every 12 hours.</span>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ══════════════════════════ CONTACT ══════════════════════════ -->
+<section id="contact">
+  <div class="sec-eyebrow reveal">/ 05 — Let's Build</div>
+  <h2 class="contact-big reveal">
+    THE NEXT<br/>
+    <em>PROJECT</em><br/>
+    COULD BE<br/>YOURS.
+  </h2>
+  <p class="contact-sub reveal">
+    I'm currently open to work — freelance projects, full-time roles,
+    and interesting collaborations. If you're building something and
+    need a developer who ships: reach out.
+  </p>
+  <div class="contact-links reveal">
+    <a href="mailto:seosolutions172@gmail.com" class="c-link">
+      <span>📧 seosolutions172@gmail.com</span>
+      <span class="c-link-right">Email</span>
+    </a>
+    <a href="https://github.com/Ahmedyasser1905" target="_blank" rel="noopener" class="c-link">
+      <span>⬡ github.com/Ahmedyasser1905</span>
+      <span class="c-link-right">GitHub</span>
+    </a>
+    <a href="https://www.linkedin.com/in/seo-solutions-4503253b9/" target="_blank" rel="noopener" class="c-link">
+      <span>🔗 LinkedIn — Ahmed Yasser</span>
+      <span class="c-link-right">Connect</span>
+    </a>
+    <a href="https://www.instagram.com/cherif._.ahmed/" target="_blank" rel="noopener" class="c-link">
+      <span>📸 @cherif._.ahmed</span>
+      <span class="c-link-right">Instagram</span>
+    </a>
+    <a href="https://www.facebook.com/profile.php?id=100035797627204" target="_blank" rel="noopener" class="c-link">
+      <span>📘 Facebook</span>
+      <span class="c-link-right">Follow</span>
+    </a>
+    <a href="https://www.tiktok.com/@cherif._.ahmed" target="_blank" rel="noopener" class="c-link">
+      <span>🎵 @cherif._.ahmed</span>
+      <span class="c-link-right">TikTok</span>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span>Ahmed Yasser &nbsp;·&nbsp; Algeria 🇩🇿 &nbsp;·&nbsp; 2025</span>
+  <span>Three.js · GSAP · Vanilla JS</span>
+</footer>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"}}</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+gsap.registerPlugin(ScrollTrigger);
+
+/* ─────────────────────────────────────────────────────────
+   PROJECT DATA (for modal)
+───────────────────────────────────────────────────────── */
+const PROJECTS = [
+  {
+    num:'01', title:'Faida Platform', subtitle:'منصة الفائدة — Agricultural Enterprise',
+    category:'Web Platform · Arabic RTL',
+    desc:`Enterprise-grade Arabic RTL agricultural management platform with 5 user roles: Admin, Provider, Farmer, Driver, and Citizen. Features interactive Leaflet maps for field tracking, Recharts analytics dashboards, PDF/Excel export via jsPDF + xlsx, Framer Motion animations, TanStack Query data management, and Zod validation. Built with a full mock-data architecture simulating a real backend.`,
+    tech:['React 18','TypeScript','Vite','TailwindCSS','Zustand','Leaflet','Recharts','TanStack Query','Zod','Framer Motion'],
+    links:[{label:'Live Demo →',url:'https://faida-platform.vercel.app',live:true}]
+  },
+  {
+    num:'02', title:'BarberDZ — 7afefli', subtitle:'Full-Stack Salon Booking Monorepo',
+    category:'Monorepo · Mobile + Web + API',
+    desc:`Full-stack salon booking ecosystem as a monorepo: React Native mobile client for customers, Next.js web admin dashboard for salon owners, and a NestJS REST API backend. Geo-location search implemented with PostGIS, real-time booking updates, barber photo portfolios, k6 load testing for API stress validation, Docker containerization deployed on Render.`,
+    tech:['React Native','NestJS','Next.js','Supabase','PostGIS','Docker','TypeScript','k6'],
+    links:[{label:'GitHub →',url:'https://github.com/Ahmedyasser1905'}]
+  },
+  {
+    num:'03', title:'Nova AI', subtitle:'Multi-Model Document Intelligence',
+    category:'AI Integration · Multi-Model',
+    desc:`AI assistant that processes real documents through a pipeline: file upload → Tesseract OCR text extraction → PDF parsing → multi-model AI response from Gemini or OpenAI. Express.js backend with JWT authentication, MongoDB for conversation history, Docker containerized and deployed on Render. React Native mobile frontend.`,
+    tech:['React Native','Google Gemini','OpenAI API','Express.js','MongoDB','Docker','JWT','Tesseract OCR'],
+    links:[{label:'GitHub →',url:'https://github.com/Ahmedyasser1905'}]
+  },
+  {
+    num:'04', title:'SPY الجاسوس', subtitle:'Spyfall Party Game v2.0 — 3D Mobile',
+    category:'Mobile Game · Three.js',
+    desc:`Spyfall-style party word game where one player is a spy who doesn't know the secret location. Built with Three.js 3D scenes rendered via expo-gl for immersive visual effects. Multi-language with full Arabic RTL support via i18next. Haptic feedback via expo-haptics, spatial audio, Zustand for state management. Published on app stores as com.spygame.dz.`,
+    tech:['React Native','Three.js','Expo GL','i18next','Zustand','EAS Build','expo-haptics','expo-av'],
+    links:[{label:'GitHub →',url:'https://github.com/Ahmedyasser1905'}]
+  },
+  {
+    num:'05', title:'Rawdati — روضتي', subtitle:'Arabic RTL Nursery Parent-Educator App',
+    category:'Mobile · Firebase · Arabic RTL',
+    desc:`Arabic RTL communication platform connecting nursery parents and educators. Comprehensive Firebase integration: Firestore for real-time data, Authentication for secure login, Storage for photos, Cloud Functions for backend logic. Push notifications for activity alerts, child progress tracking, Lottie animations for delightful UX, full RTL design system.`,
+    tech:['React Native','Firebase (Firestore, Auth, Storage, Functions)','Zustand','i18next RTL','Lottie','Push Notifications'],
+    links:[{label:'Live Demo →',url:'https://rawdha.vercel.app',live:true},{label:'GitHub →',url:'https://github.com/Ahmedyasser1905/Rawdha'}]
+  },
+  {
+    num:'06', title:'PFE — Smart Construction', subtitle:'Graduation Project · 3-Platform Ecosystem',
+    category:'Graduation · Full-Stack Ecosystem',
+    desc:`Graduation project spanning three platforms under one engineering domain. NestJS TypeScript API deployed live on Vercel with 4 tracked issues. React Native mobile app with offline-first architecture using SQLite + Zustand + Skia for smooth drawing. Flutter desktop/tablet estimator with Riverpod state management, PDF report generation, fl_chart visualizations.`,
+    tech:['NestJS','TypeScript','React Native','SQLite','Zustand','React Native Skia','Flutter','Riverpod','fl_chart','Vercel'],
+    links:[{label:'Live API →',url:'https://pfe-backend-tau.vercel.app',live:true},{label:'GitHub →',url:'https://github.com/Ahmedyasser1905/PFE1'}]
+  }
+];
+
+/* ─────────────────────────────────────────────────────────
+   MODAL — event delegation (works inside transformed containers)
+───────────────────────────────────────────────────────── */
+function openModal(idx) {
+  const p = PROJECTS[idx];
+  if (!p) return;
+  const linksHtml = p.links.map(l =>
+    `<a href="${l.url}" target="_blank" rel="noopener" class="proj-link${l.live?' live':''}" style="text-decoration:none">${l.label}</a>`
+  ).join('');
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-num">${p.num}</div>
+    <h3 class="modal-title">${p.title}</h3>
+    <div class="modal-sub">${p.subtitle}</div>
+    <div class="modal-section-title">Overview</div>
+    <p class="modal-desc">${p.desc}</p>
+    <div class="modal-section-title">Technologies</div>
+    <div class="modal-pills">${p.tech.map(t=>`<span class="modal-pill">${t}</span>`).join('')}</div>
+    <div class="modal-links">${linksHtml}</div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+// Event delegation — catches clicks even inside GSAP-transformed containers
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-modal]');
+  if (btn) { e.stopPropagation(); openModal(parseInt(btn.dataset.modal, 10)); }
+});
+
+const modalOverlay = document.getElementById('modal-overlay');
+modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ─────────────────────────────────────────────────────────
+   LOADER
+───────────────────────────────────────────────────────── */
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('loader').classList.add('done'), 1500);
+});
+
+/* ─────────────────────────────────────────────────────────
+   THREE.JS SCENE
+───────────────────────────────────────────────────────── */
+const canvas = document.getElementById('bg');
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x040608, 0.03);
+
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
+camera.position.set(0, 2, 10);
+
+// ── Lights ──
+const ambient = new THREE.AmbientLight(0xffffff, 0.1);
+scene.add(ambient);
+const pointLight = new THREE.PointLight(0x7c3aed, 8, 30);
+pointLight.position.set(0, 5, 5);
+scene.add(pointLight);
+const pointLight2 = new THREE.PointLight(0x06b6d4, 5, 25);
+pointLight2.position.set(-5, -2, 3);
+scene.add(pointLight2);
+
+// ── Central TorusKnot ──
+const knotGeo = new THREE.TorusKnotGeometry(2, 0.4, 120, 16, 2, 3);
+const knotMat = new THREE.MeshBasicMaterial({
+  color: 0x7c3aed, wireframe: true, opacity: 0.12, transparent: true
+});
+const knot = new THREE.Mesh(knotGeo, knotMat);
+scene.add(knot);
+
+// ── Grid floor ──
+const grid = new THREE.GridHelper(60, 40, 0x7c3aed, 0x0d1525);
+grid.material.opacity = 0.08; grid.material.transparent = true;
+grid.position.y = -6;
+scene.add(grid);
+
+// ── Floating polyhedra ──
+const floaters = [];
+const fGeos = [
+  new THREE.IcosahedronGeometry(0.7, 0),
+  new THREE.OctahedronGeometry(0.6),
+  new THREE.TetrahedronGeometry(0.8),
+  new THREE.IcosahedronGeometry(0.4, 0),
+  new THREE.OctahedronGeometry(0.9),
+];
+const positions = [
+  [-6, 2, -3], [5, -1, -5], [-4, -2, -2], [7, 3, -4], [-7, 0, -6]
+];
+const colors = [0x7c3aed, 0x06b6d4, 0xf43f5e, 0xa78bfa, 0x06b6d4];
+fGeos.forEach((g, i) => {
+  const m = new THREE.MeshBasicMaterial({ color: colors[i], wireframe: true, opacity: 0.1 + Math.random()*0.06, transparent: true });
+  const mesh = new THREE.Mesh(g, m);
+  mesh.position.set(...positions[i]);
+  floaters.push({ mesh, speed: 0.3 + Math.random() * 0.4, offset: Math.random() * Math.PI * 2 });
+  scene.add(mesh);
+});
+
+// ── Particles ──
+const isMobile = window.innerWidth < 768;
+const pCount = isMobile ? 150 : 450;
+const pPos = new Float32Array(pCount * 3);
+for (let i = 0; i < pCount; i++) {
+  pPos[i*3]   = (Math.random() - 0.5) * 40;
+  pPos[i*3+1] = (Math.random() - 0.5) * 30;
+  pPos[i*3+2] = (Math.random() - 0.5) * 30;
+}
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+const pMat = new THREE.PointsMaterial({ color: 0x7c3aed, size: 0.06, sizeAttenuation: true, transparent: true, opacity: 0.6 });
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+// ── Mouse camera lerp ──
+let mx = 0, my = 0, camX = 0, camY = 0;
+const WH = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+document.addEventListener('mousemove', e => {
+  mx = (e.clientX - WH.x) / WH.x;
+  my = (e.clientY - WH.y) / WH.y;
+});
+
+// ── Scene color per project ──
+const sceneColors = [
+  { p: 0x10b981, s: 0x064e3b },  // faida: green
+  { p: 0x7c3aed, s: 0x4c1d95 },  // barber: violet
+  { p: 0xf43f5e, s: 0x9f1239 },  // nova: rose
+  { p: 0xf97316, s: 0x92400e },  // spy: orange
+  { p: 0x06b6d4, s: 0x164e63 },  // rawdati: cyan
+  { p: 0x6366f1, s: 0x3730a3 },  // pfe: indigo
+];
+
+window.updateSceneTheme = function(idx) {
+  if (idx < 0 || idx >= sceneColors.length) return;
+  const c = sceneColors[idx];
+  gsap.to(knotMat.color, { r: ((c.p >> 16) & 255) / 255, g: ((c.p >> 8) & 255) / 255, b: (c.p & 255) / 255, duration: 1 });
+  gsap.to(pointLight.color, { r: ((c.p >> 16) & 255) / 255, g: ((c.p >> 8) & 255) / 255, b: (c.p & 255) / 255, duration: 1 });
+  gsap.to(pMat.color, { r: ((c.s >> 16) & 255) / 255, g: ((c.s >> 8) & 255) / 255, b: (c.s & 255) / 255, duration: 1.5 });
+};
+
+// ── Resize ──
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  WH.x = window.innerWidth / 2; WH.y = window.innerHeight / 2;
+});
+
+// ── Animation loop ──
+const clock = new THREE.Clock();
+(function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  // Camera mouse follow
+  camX += (mx * 1.5 - camX) * 0.03;
+  camY += (-my * 1.0 - camY) * 0.03;
+  camera.position.x = camX;
+  camera.position.y = 2 + camY;
+  camera.lookAt(0, 0, 0);
+
+  // Rotate knot + particles
+  knot.rotation.x = t * 0.08 + my * 0.15;
+  knot.rotation.y = t * 0.12 + mx * 0.15;
+  particles.rotation.y = t * 0.012;
+  particles.rotation.x = t * 0.008;
+
+  // Float polyhedra
+  floaters.forEach(({ mesh, speed, offset }) => {
+    mesh.rotation.x = t * speed * 0.5;
+    mesh.rotation.y = t * speed;
+    mesh.position.y += Math.sin(t * speed + offset) * 0.002;
+  });
+
+  // Pulse light intensity
+  pointLight.intensity = 6 + Math.sin(t * 0.8) * 2;
+
+  renderer.render(scene, camera);
+})();
+
+/* ─────────────────────────────────────────────────────────
+   CUSTOM CURSOR
+───────────────────────────────────────────────────────── */
+if (!isMobile && window.matchMedia('(pointer: fine)').matches) {
+  const dot = document.getElementById('cur-dot');
+  const ring = document.getElementById('cur-ring');
+  const curEl = document.getElementById('cur');
+  let cx = -100, cy = -100, rx = -100, ry = -100;
+
+  document.addEventListener('mousemove', e => { cx = e.clientX; cy = e.clientY; });
+
+  (function moveCursor() {
+    requestAnimationFrame(moveCursor);
+    dot.style.transform = `translate(${cx}px,${cy}px) translate(-50%,-50%)`;
+    rx += (cx - rx) * 0.1; ry += (cy - ry) * 0.1;
+    ring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+  })();
+
+  document.querySelectorAll('a, button, .btn, .tech-node, .about-fact, .c-link').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+  });
+}
+
+/* ─────────────────────────────────────────────────────────
+   SCROLL PROGRESS
+───────────────────────────────────────────────────────── */
+const prog = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const s = document.documentElement.scrollTop;
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  prog.style.width = (s / h * 100) + '%';
+}, { passive: true });
+
+/* ─────────────────────────────────────────────────────────
+   NAV SCROLL BEHAVIOUR
+───────────────────────────────────────────────────────── */
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 50);
+}, { passive: true });
+
+/* ─────────────────────────────────────────────────────────
+   GSAP HERO ANIMATION
+───────────────────────────────────────────────────────── */
+const heroTL = gsap.timeline({ delay: 1.6 });
+heroTL
+  .to('.hero-status',    { opacity:1, y:0, duration:0.6, ease:'power3.out' })
+  .to('.hero-name',      { opacity:1, y:0, duration:0.8, ease:'power3.out' }, '-=0.3')
+  .to('.hero-role',      { opacity:1, y:0, duration:0.6, ease:'power3.out' }, '-=0.4')
+  .to('.hero-statement', { opacity:1, y:0, duration:0.6, ease:'power3.out' }, '-=0.3')
+  .to('.hero-ctas',      { opacity:1, y:0, duration:0.6, ease:'power3.out' }, '-=0.3')
+  .to('.hero-panel',     { opacity:1, x:0, duration:0.9, ease:'power3.out' }, '-=0.5');
+
+/* ─────────────────────────────────────────────────────────
+   GSAP SCROLL REVEALS
+───────────────────────────────────────────────────────── */
+function makeReveal(selector, fromX, fromY, stagger = 0) {
+  document.querySelectorAll(selector).forEach(el => {
+    gsap.fromTo(el,
+      { opacity: 0, x: fromX, y: fromY },
+      {
+        opacity: 1, x: 0, y: 0,
+        duration: 0.9, ease: 'power3.out',
+        stagger,
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+      }
+    );
+  });
+}
+makeReveal('.reveal', 0, 40);
+makeReveal('.reveal-left', -60, 0);
+makeReveal('.reveal-right', 60, 0);
+
+/* ─────────────────────────────────────────────────────────
+   HORIZONTAL PROJECT SCROLL (Desktop only)
+───────────────────────────────────────────────────────── */
+const track = document.getElementById('projects-track');
+const outer = document.getElementById('projects-outer');
+
+if (!isMobile && window.innerWidth >= 900) {
+  const panels = track.querySelectorAll('.project-panel');
+  const totalPanels = panels.length;
+  const getScrollWidth = () => track.scrollWidth - outer.clientWidth;
+
+  outer.style.height = `${window.innerHeight + getScrollWidth()}px`;
+
+  gsap.to(track, {
+    x: () => -getScrollWidth(),
+    ease: 'none',
+    scrollTrigger: {
+      trigger: outer,
+      pin: '.projects-sticky',
+      scrub: 0.5,
+      start: 'top top',
+      end: () => `+=${getScrollWidth()}`,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+      onUpdate(self) {
+        const idx = Math.min(totalPanels - 1, Math.floor(self.progress * totalPanels));
+        updateSceneTheme(idx);
+        updatePips(idx);
+        panels.forEach((p, i) => {
+          p.querySelector('.proj-counter').style.opacity = i === idx ? '1' : '0.3';
+        });
+      }
+    }
+  });
+}
+
+/* ─────────────────────────────────────────────────
+   ALL PROJECTS DATA + RENDER
+───────────────────────────────────────────────── */
+const ALL_PROJECTS = [
+  { n:'01', name:'Faida Platform', sub:'منصة الفائدة — Agricultural Enterprise', type:'web', label:'Web · RTL', color:'#10b981', featured:true,
+    desc:'Arabic RTL agricultural platform — 5 roles, Leaflet maps, Recharts, PDF/Excel export, Framer Motion.',
+    tech:['React 18','TypeScript','Vite','TailwindCSS','Zustand','Leaflet'],
+    links:[{t:'Live ↗',u:'https://faida-platform.vercel.app',live:true}] },
+  { n:'02', name:'BarberDZ — 7afefli', sub:'Salon Booking Monorepo', type:'mobile', label:'Mobile + API', color:'#a78bfa', featured:true,
+    desc:'Monorepo: React Native client, Next.js admin, NestJS API, PostGIS geo-search, Docker on Render.',
+    tech:['React Native','NestJS','Next.js','Supabase','PostGIS','Docker'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'03', name:'Nova AI', sub:'Multi-Model Document Intelligence', type:'ai', label:'AI · Mobile', color:'#f43f5e', featured:true,
+    desc:'Tesseract OCR + PDF parsing pipeline feeding Gemini/OpenAI. Express + MongoDB + Docker on Render.',
+    tech:['React Native','Gemini','OpenAI','Express','MongoDB','Docker'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'04', name:'SPY الجاسوس', sub:'Spyfall 3D Party Game', type:'game', label:'Mobile Game', color:'#f97316', featured:true,
+    desc:'Spyfall party game with Three.js 3D via expo-gl, Arabic i18n, haptic feedback. Published as com.spygame.dz.',
+    tech:['React Native','Three.js','Expo GL','i18next','Zustand','EAS'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'05', name:'Rawdati — روضتي', sub:'Nursery Parent-Educator App', type:'mobile', label:'Mobile · Firebase', color:'#06b6d4', featured:true,
+    desc:'Arabic RTL nursery app — Firebase Auth, Firestore, Storage, Functions, push notifications, Lottie.',
+    tech:['React Native','Firebase','Zustand','RTL','Lottie'],
+    links:[{t:'Live ↗',u:'https://rawdha.vercel.app',live:true},{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905/Rawdha'}] },
+  { n:'06', name:'PFE Smart Construction', sub:'Graduation · 3-Platform Ecosystem', type:'mobile', label:'Graduation', color:'#6366f1', featured:true,
+    desc:'NestJS API (live on Vercel), React Native offline app (SQLite + Skia), Flutter estimator (Riverpod + PDF).',
+    tech:['NestJS','TypeScript','React Native','Flutter','SQLite','Vercel'],
+    links:[{t:'API ↗',u:'https://pfe-backend-tau.vercel.app',live:true},{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905/PFE1'}] },
+  { n:'07', name:'Brain Arena', sub:'AI Trivia Quiz Game', type:'game', label:'Mobile Game', color:'#8b5cf6', featured:false,
+    desc:'Multiplayer trivia quiz with Google Auth, AI-generated questions, and i18n localization.',
+    tech:['React Native','Expo','Google Auth','i18next','Firebase'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'08', name:'Chess', sub:'Mobile Chess Game', type:'game', label:'Mobile Game', color:'#94a3b8', featured:false,
+    desc:'Full chess game with chess.js engine and Firebase multiplayer matchmaking.',
+    tech:['React Native','chess.js','Firebase','Expo'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'09', name:'PIZZA APP', sub:'Food Ordering Platform', type:'mobile', label:'Mobile · Real-Time', color:'#ef4444', featured:false,
+    desc:'Food ordering with real-time order tracking via Socket.io, MongoDB backend, Expo frontend.',
+    tech:['Expo','MongoDB','Socket.io','Node.js','Express'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'10', name:'Webetu (Progress)', sub:'Student Progress Tracker', type:'mobile', label:'Mobile', color:'#3b82f6', featured:false,
+    desc:'Academic progress tracker with dashboard, grade management, and student profiles.',
+    tech:['React Native','Expo','Firebase'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'11', name:'Romio', sub:'Romantic Gift Experience', type:'mobile', label:'Mobile', color:'#ec4899', featured:false,
+    desc:'Interactive romantic gift app with Lottie animations and custom love experiences.',
+    tech:['React Native','Lottie','Expo','Reanimated'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'12', name:'Loup Garou', sub:'Werewolf Multiplayer Game', type:'game', label:'Mobile Game', color:'#78716c', featured:false,
+    desc:'Online multiplayer Werewolf party game with Socket.io real-time gameplay and role management.',
+    tech:['React Native','Socket.io','Expo','Node.js'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'13', name:'سيف المعرفة', sub:'Islamic Educational App', type:'mobile', label:'Mobile · Arabic', color:'#059669', featured:false,
+    desc:'Islamic educational app with audio recitation, full Arabic RTL, and offline content library.',
+    tech:['React Native','Expo','Arabic RTL','expo-av'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'14', name:'Zenith AI', sub:'Neon Trader — AI Trading', type:'ai', label:'AI · Mobile', color:'#0ea5e9', featured:false,
+    desc:'AI-assisted trading platform with real-time market data, Supabase backend, React Native frontend.',
+    tech:['React Native','Supabase','NativeWind','Expo'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'15', name:'Buildest Auth', sub:'Construction Platform Mobile', type:'mobile', label:'Mobile · Expo', color:'#b45309', featured:false,
+    desc:'Auth and user-management frontend for the Buildest construction management platform.',
+    tech:['React Native','Expo Router','Supabase','EAS'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'16', name:'PFE FLUTTER', sub:'Smart Construction Estimator', type:'flutter', label:'Flutter', color:'#0284c7', featured:false,
+    desc:'Flutter estimator app with material cost PDF export, fl_chart analytics, and Riverpod state.',
+    tech:['Flutter','Dart','Riverpod','fl_chart','PDF Export'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905/PFE1'}] },
+  { n:'17', name:'IPTV Player', sub:'Flutter Streaming App', type:'flutter', label:'Flutter', color:'#7c3aed', featured:false,
+    desc:'M3U playlist IPTV player with category browser, video_player, and Chewie controls.',
+    tech:['Flutter','Dart','video_player','Chewie'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'18', name:'HemaEvidence', sub:'Blood Cancer Tracker — Android', type:'flutter', label:'Android · Kotlin', color:'#dc2626', featured:false,
+    desc:'Offline-first blood cancer patient tracker built with Kotlin, Jetpack Compose, and Room DB.',
+    tech:['Kotlin','Jetpack Compose','Room','Android'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'19', name:'Creche Flow', sub:'Nursery Admin Dashboard', type:'web', label:'Web · Next.js', color:'#8b5cf6', featured:false,
+    desc:'Next.js 16 nursery management dashboard with Recharts analytics, TailwindCSS, and dark mode.',
+    tech:['Next.js 16','TailwindCSS','Recharts','TypeScript'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'20', name:'Frontend PFE', sub:'Construction Project SPA', type:'web', label:'Web · React', color:'#0891b2', featured:false,
+    desc:'React + Vite SPA for construction project management with TailwindCSS and modular UI.',
+    tech:['React','Vite','TailwindCSS','TypeScript'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'21', name:'Nursery Management', sub:'Full-Stack Nursery System', type:'web', label:'Web · Full-Stack', color:'#16a34a', featured:false,
+    desc:'Full-stack nursery system with Express/MySQL backend and React/Vite frontend dashboard.',
+    tech:['React','Vite','Express','MySQL','Node.js'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'22', name:'Creche System', sub:'Arabic Kindergarten Platform', type:'web', label:'Web · PHP', color:'#7c3aed', featured:false,
+    desc:'Full-stack Arabic RTL kindergarten management built with PHP and MySQL.',
+    tech:['PHP','MySQL','HTML/CSS','Arabic RTL'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'23', name:'Baby Store', sub:'E-Commerce Platform', type:'web', label:'Web · E-Commerce', color:'#f59e0b', featured:false,
+    desc:'BabyStore e-commerce with HTML/JS frontend, PHP backend, and MySQL product database.',
+    tech:['PHP','MySQL','JavaScript','HTML/CSS'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'24', name:'NEWC', sub:'Nursery Web System', type:'web', label:'Web · PHP', color:'#64748b', featured:false,
+    desc:'PHP/MySQL nursery management web system with admin interface (earlier iteration).',
+    tech:['PHP','MySQL','HTML/CSS'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'25', name:'PopCash Bot', sub:'Ad Traffic Automation', type:'tool', label:'Tool · Java', color:'#78350f', featured:false,
+    desc:'Java Swing desktop automation tool using Selenium for ad-traffic generation with VPN cycling.',
+    tech:['Java','Selenium','Swing','VPN Automation'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'26', name:'Blogger Templates', sub:'XML Theme Collection', type:'tool', label:'Tool', color:'#f97316', featured:false,
+    desc:'Custom Blogger.com XML template collection with modern, responsive layouts.',
+    tech:['XML','HTML/CSS','Blogger API'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'27', name:'KDP Book', sub:'Espresso Yourself — Amazon KDP', type:'tool', label:'Content', color:'#92400e', featured:false,
+    desc:'Self-published book formatted for Amazon KDP using Markdown, PDF, and PPTX export pipeline.',
+    tech:['Markdown','PDF','PowerPoint','KDP'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'28', name:'DSS', sub:'Decision Support System', type:'tool', label:'Academic', color:'#475569', featured:false,
+    desc:'Decision Support System academic project with XML data modeling and analysis exercises.',
+    tech:['XML','Data Modeling'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'29', name:'منصة قصتي (QISSATI)', sub:'Custom Story E-Commerce & Flutter Admin', type:'mobile', label:'Full-Stack · Flutter', color:'#f59e0b', featured:false,
+    desc:'E-commerce platform for custom children stories. Flutter RTL admin app with Firebase FCM push alerts, Supabase PostgreSQL, Telegram Bot webhook, and Vercel serverless backend.',
+    tech:['Flutter','Dart','Supabase','Node.js','Telegram Bot','Firebase FCM','Vercel'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'30', name:'APK Video Agent', sub:'AI Promo Video Automation', type:'ai', label:'AI · MCP Agent', color:'#8b5cf6', featured:false,
+    desc:'Autonomous AI agent that tests Android APKs, analyzes UI via GPT-4o Vision, writes marketing scripts, generates ElevenLabs voiceovers, and renders cinematic promotional MP4s with FFmpeg.',
+    tech:['Python','FastMCP','GPT-4o Vision','ElevenLabs','Whisper','FFmpeg','ADB'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+];
+
+function renderAllProjects(filter) {
+  const grid = document.getElementById('all-proj-grid');
+  const list = filter === 'all' ? ALL_PROJECTS : ALL_PROJECTS.filter(p => p.type === filter);
+  grid.innerHTML = list.map(p => {
+    const linksHtml = p.priv
+      ? '<span style="font-size:0.52rem;letter-spacing:2px;color:#334155">PRIVATE</span>'
+      : p.links.map(l =>
+          `<a href="${l.u}" target="_blank" rel="noopener" class="ap-link${l.live?' live':''}">${l.t}</a>`
+        ).join('');
+    return `<div class="ap-card${p.featured?' featured':''}" data-type="${p.type}">
+      ${p.featured ? '<div class="ap-featured-badge">★ FEATURED</div>' : ''}
+      <div class="ap-card-header">
+        <span class="ap-card-num">${p.n}</span>
+        <span class="ap-card-type" style="color:${p.color};border-color:${p.color}44">${p.label}</span>
+      </div>
+      <div class="ap-card-name">${p.name}</div>
+      <div class="ap-card-desc">${p.desc}</div>
+      <div class="ap-card-pills">${p.tech.map(t=>`<span class="ap-card-pill">${t}</span>`).join('')}</div>
+      <div class="ap-card-links">${linksHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+document.querySelectorAll('.apf-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.apf-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderAllProjects(btn.dataset.filter);
+  });
+});
+
+renderAllProjects('all');
+
+/* ─────────────────────────────────────────────────────────
+   PROJECT PIPS
+───────────────────────────────────────────────────────── */
+const allPips = document.querySelectorAll('.proj-pip');
+function updatePips(idx) {
+  allPips.forEach((pip, i) => pip.classList.toggle('active', i === idx));
+}
+
+/* ─────────────────────────────────────────────────────────
+   PROJECT VISUAL TILT
+───────────────────────────────────────────────────────── */
+document.querySelectorAll('.proj-visual-wrap').forEach(wrap => {
+  const visual = wrap.querySelector('.proj-visual');
+  if (!visual) return;
+
+  wrap.addEventListener('mousemove', e => {
+    const r = wrap.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    gsap.to(visual, {
+      rotateX: -y * 12, rotateY: x * 12,
+      duration: 0.4, ease: 'power2.out',
+      overwrite: 'auto'
+    });
+  });
+
+  wrap.addEventListener('mouseleave', () => {
+    gsap.to(visual, { rotateX: 0, rotateY: 0, duration: 0.7, ease: 'power3.out', overwrite: 'auto' });
+  });
+});
+
+/* ─────────────────────────────────────────────────────────
+   COUNTER ANIMATION
+───────────────────────────────────────────────────────── */
+document.querySelectorAll('[data-count]').forEach(el => {
+  const target = parseInt(el.dataset.count);
+  ScrollTrigger.create({
+    trigger: el, start: 'top 85%', once: true,
+    onEnter: () => {
+      let n = 0;
+      const step = target / 40;
+      const iv = setInterval(() => {
+        n = Math.min(n + step, target);
+        el.textContent = Math.ceil(n);
+        if (n >= target) clearInterval(iv);
+      }, 28);
+    }
+  });
+});
+
+/* ─────────────────────────────────────────────────────────
+   ACTIVE NAV LINKS
+───────────────────────────────────────────────────────── */
+const sections = document.querySelectorAll('section[id], div[id="projects-outer"]');
+const navLinks = document.querySelectorAll('.nav-links a[data-section]');
+const navObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.nav-links a[data-section="${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.4 });
+sections.forEach(s => navObs.observe(s));
+
+/* ─────────────────────────────────────────────────────────
+   SMOOTH SCROLL FOR NAV LINKS
+───────────────────────────────────────────────────────── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) {
+      e.preventDefault();
+      window.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>

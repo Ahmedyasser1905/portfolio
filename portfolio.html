@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ahmed Yasser — Mobile Engineer, Full-Stack Developer &amp; AI Integrator from Algeria. 30+ shipped products.">
+  <title>Ahmed Yasser — Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:       #080b14;
+      --surface:  #0d1120;
+      --surface2: #111827;
+      --violet:   #7c3aed;
+      --violet2:  #a78bfa;
+      --cyan:     #06b6d4;
+      --rose:     #f43f5e;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --border:   rgba(124,58,237,0.25);
+      --glow-v:   0 0 40px rgba(124,58,237,0.35);
+      --glow-c:   0 0 40px rgba(6,182,212,0.35);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; overflow-x: hidden; cursor: none; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+    /* CURSOR */
+    .cursor { position: fixed; width: 10px; height: 10px; background: var(--cyan); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform 0.08s, background 0.2s; box-shadow: 0 0 12px var(--cyan); }
+    .cursor-ring { position: fixed; width: 34px; height: 34px; border: 1px solid rgba(6,182,212,0.6); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform 0.18s cubic-bezier(.17,.67,.83,.67), width 0.2s, height 0.2s; }
+
+    /* THREE.JS CANVAS */
+    #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    /* NAV */
+    nav { position: fixed; top:0; left:0; right:0; display: flex; align-items:center; justify-content:space-between; padding: 18px 48px; background: rgba(8,11,20,0.75); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); z-index: 100; }
+    .nav-logo { font-family: 'Orbitron', monospace; font-weight: 900; font-size: 1rem; color: var(--cyan); letter-spacing: 3px; text-decoration: none; }
+    .nav-links { display:flex; gap: 32px; list-style:none; }
+    .nav-links a { color: var(--muted); font-size: 0.7rem; text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--cyan); }
+    @media (max-width:768px) { .nav-links { display:none; } nav { padding:16px 24px; } }
+
+    main { position: relative; z-index: 1; }
+    section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 120px 10vw 80px; max-width: 1300px; margin: 0 auto; }
+
+    /* HERO */
+    #hero { min-height: 100vh; max-width: 100%; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 0 10vw; position: relative; }
+    .hero-eyebrow { font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase; color: var(--cyan); margin-bottom: 20px; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; }
+    .hero-name { font-family: 'Orbitron', monospace; font-size: clamp(3rem, 8vw, 7rem); font-weight: 900; line-height: 0.9; color: var(--text); margin-bottom: 12px; opacity: 0; animation: fadeUp 0.8s 0.4s forwards; }
+    .hero-name span { color: var(--violet2); }
+    .hero-role { font-size: clamp(0.8rem, 2vw, 1.1rem); color: var(--muted); margin-bottom: 40px; opacity: 0; animation: fadeUp 0.8s 0.6s forwards; }
+    .hero-role em { color: var(--violet2); font-style: normal; }
+    .hero-tagline { font-size: clamp(0.68rem, 1.5vw, 0.82rem); color: var(--cyan); letter-spacing: 1px; border-left: 2px solid var(--cyan); padding-left: 16px; margin-bottom: 48px; opacity: 0; animation: fadeUp 0.8s 0.8s forwards; max-width: 540px; line-height: 1.8; }
+    .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.8s 1s forwards; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; transition: all 0.25s; }
+    .btn-primary { background: linear-gradient(135deg, var(--violet), var(--cyan)); color: #fff; box-shadow: var(--glow-v); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 60px rgba(124,58,237,0.5); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--violet2); }
+    .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); transform: translateY(-2px); }
+    .hero-scroll { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: 0.55rem; letter-spacing: 3px; animation: bounce 2s infinite; }
+    .hero-scroll::after { content: ''; display:block; width:1px; height:40px; background: linear-gradient(var(--violet), transparent); }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes bounce { 0%,100% { transform:translateX(-50%) translateY(0); } 50% { transform:translateX(-50%) translateY(-8px); } }
+
+    /* SECTION HEADERS */
+    .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 64px; }
+    .section-label { font-family: 'Orbitron', monospace; font-size: 0.6rem; color: var(--cyan); letter-spacing: 5px; text-transform: uppercase; }
+    .section-title { font-family: 'Orbitron', monospace; font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight: 900; color: var(--text); }
+    .section-line { flex:1; height:1px; background: var(--border); }
+
+    /* ABOUT */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    @media (max-width:768px) { .about-grid { grid-template-columns:1fr; } }
+    .about-text { line-height: 1.9; color: var(--muted); font-size: 0.78rem; }
+    .about-text p { margin-bottom: 20px; }
+    .about-text strong { color: var(--violet2); }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); padding: 28px 24px; text-align: center; position: relative; overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s; }
+    .stat-card::before { content: ''; position:absolute; inset:0; background: linear-gradient(135deg, rgba(124,58,237,0.05), transparent); }
+    .stat-card:hover { border-color: rgba(124,58,237,0.5); box-shadow: var(--glow-v); }
+    .stat-num { font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: 900; color: var(--violet2); display: block; }
+    .stat-label { font-size: 0.58rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+
+    /* SKILLS */
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+    .skill-group { background: var(--surface); border: 1px solid var(--border); padding: 28px; transition: border-color 0.3s, box-shadow 0.3s; }
+    .skill-group:hover { border-color: rgba(6,182,212,0.4); box-shadow: var(--glow-c); }
+    .skill-group-title { font-family: 'Orbitron', monospace; font-size: 0.58rem; letter-spacing: 4px; color: var(--cyan); text-transform: uppercase; margin-bottom: 20px; }
+    .skill-item { margin-bottom: 14px; }
+    .skill-name-row { display:flex; justify-content:space-between; margin-bottom: 6px; font-size:0.7rem; }
+    .skill-name { color: var(--text); }
+    .skill-pct { color: var(--muted); }
+    .skill-bar { height: 2px; background: rgba(255,255,255,0.06); }
+    .skill-fill { height:100%; background: linear-gradient(90deg, var(--violet), var(--cyan)); width: 0; transition: width 1.2s cubic-bezier(.17,.67,.83,.67); }
+
+    /* PROJECTS */
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+    @media (max-width:768px) { .projects-grid { grid-template-columns:1fr; } }
+    .project-card { background: var(--surface); border: 1px solid var(--border); overflow: hidden; position: relative; transition: transform 0.35s cubic-bezier(.17,.67,.83,.67), border-color 0.3s, box-shadow 0.3s; transform-style: preserve-3d; }
+    .project-card:hover { transform: translateY(-8px) perspective(800px) rotateX(2deg) rotateY(-1deg); border-color: rgba(124,58,237,0.5); box-shadow: 0 24px 60px rgba(124,58,237,0.15), 0 0 1px rgba(167,139,250,0.4); }
+    .project-visual { height: 200px; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+    .project-visual-bg { position:absolute; inset:0; transition: transform 0.4s; }
+    .project-card:hover .project-visual-bg { transform: scale(1.06); }
+    .p-violet { background: linear-gradient(135deg, #1e0a3c, #0a0620, #2d1244); }
+    .p-cyan   { background: linear-gradient(135deg, #0a1e28, #082030, #0c2e3a); }
+    .p-rose   { background: linear-gradient(135deg, #2a0a1e, #1a0a28, #3a0a1a); }
+    .p-green  { background: linear-gradient(135deg, #0a2818, #061a10, #0a1e14); }
+    .p-orange { background: linear-gradient(135deg, #2a1a0a, #1e1006, #2e1e0a); }
+    .p-blue   { background: linear-gradient(135deg, #0a1428, #060e1e, #0c1832); }
+    .project-visual-emoji { font-size: 3.5rem; z-index: 1; }
+    .project-badge { position: absolute; top:12px; right:12px; z-index:2; padding: 3px 10px; font-size: 0.55rem; letter-spacing:2px; text-transform: uppercase; border: 1px solid; }
+    .badge-mobile { border-color: var(--violet2); color: var(--violet2); }
+    .badge-web    { border-color: var(--cyan);    color: var(--cyan);    }
+    .badge-ai     { border-color: var(--rose);    color: var(--rose);    }
+    .badge-full   { border-color: #f97316;        color: #f97316;        }
+    .badge-live { position:absolute; bottom:12px; left:12px; z-index:2; padding:3px 8px; font-size:0.5rem; letter-spacing:2px; background: rgba(6,182,212,0.12); border:1px solid rgba(6,182,212,0.4); color: var(--cyan); }
+    .project-body { padding: 24px; }
+    .project-name { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight:700; margin-bottom: 8px; color: var(--text); }
+    .project-desc { font-size: 0.68rem; color: var(--muted); line-height: 1.9; margin-bottom: 20px; }
+    .project-pills { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:20px; }
+    .pill { padding: 3px 10px; background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); font-size: 0.6rem; color: var(--violet2); letter-spacing:1px; }
+    .project-links { display:flex; gap:16px; }
+    .proj-link { display:inline-flex; align-items:center; gap:6px; font-size: 0.62rem; letter-spacing:2px; text-transform:uppercase; text-decoration:none; color: var(--cyan); border-bottom: 1px solid rgba(6,182,212,0.3); padding-bottom:1px; transition: color 0.2s, border-color 0.2s; }
+    .proj-link:hover { color: var(--violet2); border-color: var(--violet2); }
+
+    /* CONTACT */
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    @media (max-width:768px) { .contact-grid { grid-template-columns:1fr; } }
+    .contact-intro { font-size:0.78rem; color:var(--muted); line-height:1.9; margin-bottom:32px; }
+    .contact-intro strong { color:var(--violet2); }
+    .contact-links { display:flex; flex-direction:column; gap:12px; }
+    .contact-link { display:flex; align-items:center; gap:14px; text-decoration:none; color:var(--muted); font-size:0.68rem; padding:14px 18px; background: var(--surface); border:1px solid var(--border); transition: border-color 0.25s, color 0.25s, box-shadow 0.25s; }
+    .contact-link:hover { border-color: var(--cyan); color:var(--cyan); box-shadow: var(--glow-c); }
+    .contact-link span { font-size:1.1rem; }
+
+    footer { text-align:center; padding: 40px 24px; border-top: 1px solid var(--border); color: var(--muted); font-size:0.62rem; letter-spacing:2px; position: relative; z-index:1; }
+    footer a { color: var(--violet2); text-decoration:none; }
+
+    /* SCROLL REVEAL */
+    .reveal { opacity:0; transform:translateY(40px); transition: opacity 0.8s, transform 0.8s; }
+    .reveal.visible { opacity:1; transform:none; }
+    .reveal-left  { opacity:0; transform:translateX(-40px); transition: opacity 0.8s, transform 0.8s; }
+    .reveal-right { opacity:0; transform:translateX(40px);  transition: opacity 0.8s, transform 0.8s; }
+    .reveal-left.visible, .reveal-right.visible { opacity:1; transform:none; }
+  </style>
+</head>
+
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+  <a href="#hero" class="nav-logo">AY.DEV</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-eyebrow">// Algeria 🇩🇿 — Available for hire</div>
+    <h1 class="hero-name">Ahmed<br/><span>Yasser</span></h1>
+    <div class="hero-role"><em>Mobile Engineer</em> &nbsp;·&nbsp; Full-Stack Developer &nbsp;·&nbsp; AI Integrator</div>
+    <p class="hero-tagline">I build complete, deployed products — not experiments.<br/>React Native · NestJS · Next.js · Gemini · Three.js<br/>30+ shipped projects. 3 live deployments.</p>
+    <div class="hero-ctas">
+      <a href="#projects" class="btn btn-primary">↓ View Projects</a>
+      <a href="#contact" class="btn btn-outline">Get in Touch</a>
+      <a href="https://github.com/Ahmedyasser1905" target="_blank" class="btn btn-outline">GitHub ↗</a>
+    </div>
+    <div class="hero-scroll">SCROLL</div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-header reveal">
+      <span class="section-label">01</span>
+      <h2 class="section-title">About</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal-left">
+        <p>I'm a software developer from <strong>Algeria</strong> who builds complete products — mobile apps, web platforms, AI tools, and games. My work spans the entire stack: from the React Native screen the user touches, to the NestJS API, to the Supabase database.</p>
+        <p>I've shipped <strong>30+ real projects</strong> across every category: production mobile apps via EAS, full-stack web platforms with role-based dashboards, AI assistants integrating Gemini and OpenAI, party games with Three.js 3D scenes, and enterprise management systems with live Vercel deployments.</p>
+        <p>I build for <strong>Arabic and multilingual users</strong> when the project calls for it. Mobile is first-class in every project. AI is infrastructure, not a demo.</p>
+      </div>
+      <div class="stats-grid reveal-right">
+        <div class="stat-card"><span class="stat-num" data-count="30">0</span><span class="stat-label">Projects+</span></div>
+        <div class="stat-card"><span class="stat-num" data-count="3">0</span><span class="stat-label">Live Deploys</span></div>
+        <div class="stat-card"><span class="stat-num" data-count="10">0</span><span class="stat-label">Tech Stack</span></div>
+        <div class="stat-card"><span class="stat-num" data-count="5">0</span><span class="stat-label">Years Exp+</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-header reveal">
+      <span class="section-label">02</span>
+      <h2 class="section-title">Tech Stack</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Mobile</div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">React Native + Expo</span><span class="skill-pct">94%</span></div><div class="skill-bar"><div class="skill-fill" data-w="94"></div></div></div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">Flutter + Dart</span><span class="skill-pct">80%</span></div><div class="skill-bar"><div class="skill-fill" data-w="80"></div></div></div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">Android / Kotlin</span><span class="skill-pct">72%</span></div><div class="skill-bar"><div class="skill-fill" data-w="72"></div></div></div>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Backend &amp; Web</div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">NestJS + TypeScript</span><span class="skill-pct">90%</span></div><div class="skill-bar"><div class="skill-fill" data-w="90"></div></div></div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">Next.js + React</span><span class="skill-pct">88%</span></div><div class="skill-bar"><div class="skill-fill" data-w="88"></div></div></div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">Node.js + Express</span><span class="skill-pct">85%</span></div><div class="skill-bar"><div class="skill-fill" data-w="85"></div></div></div>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Data &amp; Cloud</div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">Supabase + PostgreSQL</span><span class="skill-pct">85%</span></div><div class="skill-bar"><div class="skill-fill" data-w="85"></div></div></div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">Firebase (All Services)</span><span class="skill-pct">88%</span></div><div class="skill-bar"><div class="skill-fill" data-w="88"></div></div></div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">MongoDB + Docker</span><span class="skill-pct">78%</span></div><div class="skill-bar"><div class="skill-fill" data-w="78"></div></div></div>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">AI &amp; Creative</div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">Gemini + OpenAI APIs</span><span class="skill-pct">82%</span></div><div class="skill-bar"><div class="skill-fill" data-w="82"></div></div></div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">Three.js + WebGL</span><span class="skill-pct">70%</span></div><div class="skill-bar"><div class="skill-fill" data-w="70"></div></div></div>
+        <div class="skill-item"><div class="skill-name-row"><span class="skill-name">Framer Motion + GSAP</span><span class="skill-pct">75%</span></div><div class="skill-bar"><div class="skill-fill" data-w="75"></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-header reveal">
+      <span class="section-label">03</span>
+      <h2 class="section-title">Featured Projects</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="projects-grid">
+
+      <div class="project-card reveal">
+        <div class="project-visual p-green"><div class="project-visual-bg p-green"></div><div class="project-visual-emoji">🌾</div><span class="project-badge badge-web">Web SPA</span><span class="badge-live">LIVE ✓</span></div>
+        <div class="project-body">
+          <div class="project-name">Faida Platform</div>
+          <div class="project-desc">Arabic RTL agricultural enterprise platform — 5 user roles, Leaflet maps, Recharts analytics, PDF/Excel export, Framer Motion.</div>
+          <div class="project-pills"><span class="pill">React 18</span><span class="pill">TypeScript</span><span class="pill">Vite</span><span class="pill">TailwindCSS</span><span class="pill">Zustand</span><span class="pill">Leaflet</span></div>
+          <div class="project-links"><a href="https://faida-platform.vercel.app" target="_blank" class="proj-link">Live Demo ↗</a></div>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-visual p-violet"><div class="project-visual-bg p-violet"></div><div class="project-visual-emoji">🪒</div><span class="project-badge badge-full">Full Stack</span></div>
+        <div class="project-body">
+          <div class="project-name">BarberDZ — 7afefli</div>
+          <div class="project-desc">Salon booking monorepo — React Native client, Next.js admin, NestJS API. PostGIS geo-search, real-time bookings, k6 load testing, Docker on Render.</div>
+          <div class="project-pills"><span class="pill">React Native</span><span class="pill">NestJS</span><span class="pill">Next.js</span><span class="pill">Supabase</span><span class="pill">PostGIS</span><span class="pill">Docker</span></div>
+          <div class="project-links"><a href="https://github.com/Ahmedyasser1905" target="_blank" class="proj-link">GitHub ↗</a></div>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-visual p-rose"><div class="project-visual-bg p-rose"></div><div class="project-visual-emoji">⚡</div><span class="project-badge badge-ai">AI App</span></div>
+        <div class="project-body">
+          <div class="project-name">Nova AI</div>
+          <div class="project-desc">Multi-model AI assistant — document upload, Tesseract OCR, PDF parsing, Gemini + OpenAI responses. Express backend, JWT auth, Render deployment.</div>
+          <div class="project-pills"><span class="pill">React Native</span><span class="pill">Gemini</span><span class="pill">OpenAI</span><span class="pill">Express</span><span class="pill">MongoDB</span><span class="pill">Docker</span></div>
+          <div class="project-links"><a href="https://github.com/Ahmedyasser1905" target="_blank" class="proj-link">GitHub ↗</a></div>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-visual p-orange"><div class="project-visual-bg p-orange"></div><div class="project-visual-emoji">🕵️</div><span class="project-badge badge-mobile">Mobile</span></div>
+        <div class="project-body">
+          <div class="project-name">SPY الجاسوس v2.0</div>
+          <div class="project-desc">Spyfall party game. Three.js 3D scenes via expo-gl, multi-language Arabic support, haptic feedback, spatial audio. Published as com.spygame.dz.</div>
+          <div class="project-pills"><span class="pill">React Native</span><span class="pill">Three.js</span><span class="pill">Expo GL</span><span class="pill">i18next</span><span class="pill">Zustand</span><span class="pill">EAS</span></div>
+          <div class="project-links"><a href="https://github.com/Ahmedyasser1905" target="_blank" class="proj-link">GitHub ↗</a></div>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-visual p-cyan"><div class="project-visual-bg p-cyan"></div><div class="project-visual-emoji">🌱</div><span class="project-badge badge-mobile">Mobile</span><span class="badge-live">LIVE ✓</span></div>
+        <div class="project-body">
+          <div class="project-name">Rawdati — روضتي</div>
+          <div class="project-desc">Arabic RTL nursery parent-educator mobile app. Firebase Auth, Firestore, Storage, Functions, push notifications, child tracking, Lottie animations.</div>
+          <div class="project-pills"><span class="pill">React Native</span><span class="pill">Firebase</span><span class="pill">Zustand</span><span class="pill">Arabic RTL</span><span class="pill">Lottie</span></div>
+          <div class="project-links"><a href="https://rawdha.vercel.app" target="_blank" class="proj-link">Live Demo ↗</a><a href="https://github.com/Ahmedyasser1905/Rawdha" target="_blank" class="proj-link">GitHub ↗</a></div>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-visual p-blue"><div class="project-visual-bg p-blue"></div><div class="project-visual-emoji">🏗️</div><span class="project-badge badge-full">Ecosystem</span><span class="badge-live">LIVE ✓</span></div>
+        <div class="project-body">
+          <div class="project-name">PFE — Smart Construction</div>
+          <div class="project-desc">Graduation project ecosystem: NestJS API (live on Vercel), React Native offline app (SQLite + Skia), Flutter estimator (PDF export, Riverpod).</div>
+          <div class="project-pills"><span class="pill">NestJS</span><span class="pill">TypeScript</span><span class="pill">React Native</span><span class="pill">Flutter</span><span class="pill">SQLite</span><span class="pill">Vercel</span></div>
+          <div class="project-links"><a href="https://pfe-backend-tau.vercel.app" target="_blank" class="proj-link">Live API ↗</a><a href="https://github.com/Ahmedyasser1905/PFE1" target="_blank" class="proj-link">GitHub ↗</a></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-header reveal">
+      <span class="section-label">04</span>
+      <h2 class="section-title">Contact</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="contact-grid">
+      <div class="reveal-left">
+        <p class="contact-intro">I'm currently <strong>open to work</strong> — freelance projects, full-time roles, or interesting collaborations.<br/><br/>If you're building something and need a developer who ships — reach out.</p>
+        <a href="mailto:seosolutions172@gmail.com" class="btn btn-primary" style="display:inline-flex;">Send a Message ↗</a>
+      </div>
+      <div class="contact-links reveal-right">
+        <a href="mailto:seosolutions172@gmail.com" class="contact-link"><span>📧</span> seosolutions172@gmail.com</a>
+        <a href="https://github.com/Ahmedyasser1905" target="_blank" class="contact-link"><span>⬡</span> github.com/Ahmedyasser1905</a>
+        <a href="https://www.linkedin.com/in/seo-solutions-4503253b9/" target="_blank" class="contact-link"><span>🔗</span> LinkedIn — Ahmed Yasser</a>
+        <a href="https://www.instagram.com/cherif._.ahmed/" target="_blank" class="contact-link"><span>📸</span> @cherif._.ahmed (Instagram)</a>
+        <a href="https://www.facebook.com/profile.php?id=100035797627204" target="_blank" class="contact-link"><span>📘</span> Facebook</a>
+        <a href="https://www.tiktok.com/@cherif._.ahmed" target="_blank" class="contact-link"><span>🎵</span> @cherif._.ahmed (TikTok)</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>Ahmed Yasser &nbsp;·&nbsp; Algeria 🇩🇿 &nbsp;·&nbsp; <a href="https://github.com/Ahmedyasser1905">Ahmedyasser1905</a> &nbsp;·&nbsp; Built with Three.js + Vanilla JS</p>
+</footer>
+
+<!-- THREE.JS + SCRIPTS -->
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"}}</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+const canvas = document.getElementById('bg-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
+
+// Particles
+const count = window.innerWidth < 768 ? 120 : 300;
+const pos = new Float32Array(count * 3);
+for (let i = 0; i < count; i++) {
+  pos[i*3]   = (Math.random()-0.5)*20;
+  pos[i*3+1] = (Math.random()-0.5)*20;
+  pos[i*3+2] = (Math.random()-0.5)*20;
+}
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+const pMat = new THREE.PointsMaterial({ color: 0x7c3aed, size: 0.04, sizeAttenuation: true, transparent: true, opacity: 0.7 });
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+// Wireframe objects
+const ico = new THREE.Mesh(new THREE.IcosahedronGeometry(1.6, 1), new THREE.MeshBasicMaterial({ color: 0x06b6d4, wireframe: true, opacity: 0.07, transparent: true }));
+scene.add(ico);
+const ico2 = new THREE.Mesh(new THREE.IcosahedronGeometry(0.7, 0), new THREE.MeshBasicMaterial({ color: 0xa78bfa, wireframe: true, opacity: 0.1, transparent: true }));
+ico2.position.set(3.5, 1.5, -2);
+scene.add(ico2);
+const ico3 = new THREE.Mesh(new THREE.IcosahedronGeometry(0.4, 0), new THREE.MeshBasicMaterial({ color: 0xf43f5e, wireframe: true, opacity: 0.08, transparent: true }));
+ico3.position.set(-3, -1, -1);
+scene.add(ico3);
+
+// Mouse tracking
+let mx = 0, my = 0, tx = 0, ty = 0;
+const hw = { x: window.innerWidth/2, y: window.innerHeight/2 };
+document.addEventListener('mousemove', e => { mx = (e.clientX-hw.x)/hw.x; my = (e.clientY-hw.y)/hw.y; });
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  hw.x = window.innerWidth/2; hw.y = window.innerHeight/2;
+});
+
+const clock = new THREE.Clock();
+(function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+  tx += (mx*0.5-tx)*0.04; ty += (my*0.3-ty)*0.04;
+  camera.position.x = tx; camera.position.y = -ty;
+  camera.lookAt(scene.position);
+  particles.rotation.y = t*0.018; particles.rotation.x = t*0.01;
+  ico.rotation.y = t*0.07; ico.rotation.x = t*0.04;
+  ico2.rotation.y = -t*0.11; ico2.rotation.z = t*0.06;
+  ico3.rotation.x = -t*0.09; ico3.rotation.z = t*0.05;
+  const p = (Math.sin(t*0.4)+1)*0.5;
+  pMat.color.setHSL(0.76-p*0.06, 0.9, 0.55+p*0.1);
+  renderer.render(scene, camera);
+})();
+</script>
+
+<script>
+// Cursor
+const cursor = document.getElementById('cursor'), ring = document.getElementById('cursor-ring');
+let cx=0,cy=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY;});
+(function animC(){requestAnimationFrame(animC);cursor.style.left=cx+'px';cursor.style.top=cy+'px';rx+=(cx-rx)*0.12;ry+=(cy-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';})();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.transform='translate(-50%,-50%) scale(2.5)';ring.style.width='52px';ring.style.height='52px';});
+  el.addEventListener('mouseleave',()=>{cursor.style.transform='translate(-50%,-50%) scale(1)';ring.style.width='34px';ring.style.height='34px';});
+});
+
+// Scroll reveal
+const io = new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:0.15});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>io.observe(el));
+
+// Skill bars
+const bIO = new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.skill-fill').forEach(b=>{b.style.width=b.dataset.w+'%';});bIO.unobserve(e.target);}});},{threshold:0.3});
+document.querySelectorAll('.skill-group').forEach(g=>bIO.observe(g));
+
+// Counters
+const cIO = new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('[data-count]').forEach(el=>{const t=parseInt(el.dataset.count),s=t/40;let c=0;const i=setInterval(()=>{c=Math.min(c+s,t);el.textContent=Math.ceil(c);if(c>=t)clearInterval(i);},30);});cIO.unobserve(e.target);}});},{threshold:0.4});
+document.querySelectorAll('.stats-grid').forEach(g=>cIO.observe(g));
+</script>
+</body>
+</html>
