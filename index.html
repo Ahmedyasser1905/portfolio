@@ -1007,7 +1007,8 @@ footer a { color: var(--violet2); text-decoration: none; }
     <li><a href="#hero" data-section="hero">Home</a></li>
     <li><a href="#about" data-section="about">About</a></li>
     <li><a href="#stack" data-section="stack">Stack</a></li>
-    <li><a href="#projects-outer" data-section="projects-outer">Projects</a></li>
+    <li><a href="#projects-outer" data-section="projects-outer">Showcase</a></li>
+    <li><a href="#all-projects" data-section="all-projects">All Projects</a></li>
     <li><a href="#activity" data-section="activity">Activity</a></li>
     <li><a href="#contact" data-section="contact">Contact</a></li>
   </ul>
@@ -1436,7 +1437,7 @@ footer a { color: var(--violet2); text-decoration: none; }
   <div class="sec-eyebrow reveal">/ 04 — All Systems</div>
   <h2 class="sec-title reveal">Every <em>Project</em></h2>
   <div class="sec-divider reveal"></div>
-  <div class="all-proj-filters reveal" id="proj-filters">
+  <div class="all-proj-filters" id="proj-filters">
     <button class="apf-btn active" data-filter="all">All (30)</button>
     <button class="apf-btn" data-filter="mobile">Mobile</button>
     <button class="apf-btn" data-filter="web">Web</button>
@@ -1445,7 +1446,7 @@ footer a { color: var(--violet2); text-decoration: none; }
     <button class="apf-btn" data-filter="game">Game</button>
     <button class="apf-btn" data-filter="tool">Tool</button>
   </div>
-  <div class="all-proj-grid reveal" id="all-proj-grid">
+  <div class="all-proj-grid" id="all-proj-grid">
     <!-- Rendered by JS -->
   </div>
 </section>
@@ -1453,7 +1454,7 @@ footer a { color: var(--violet2); text-decoration: none; }
 <!-- ══════════════════════════ ACTIVITY ══════════════════════════ -->
 <section id="activity">
 
-  <div class="sec-eyebrow reveal">/ 04 — Open Source</div>
+  <div class="sec-eyebrow reveal">/ 05 — Open Source</div>
   <h2 class="sec-title reveal">GitHub <em>Activity</em></h2>
   <div class="sec-divider reveal"></div>
 
@@ -1568,7 +1569,7 @@ footer a { color: var(--violet2); text-decoration: none; }
 
 <!-- ══════════════════════════ CONTACT ══════════════════════════ -->
 <section id="contact">
-  <div class="sec-eyebrow reveal">/ 05 — Let's Build</div>
+  <div class="sec-eyebrow reveal">/ 06 — Let's Build</div>
   <h2 class="contact-big reveal">
     THE NEXT<br/>
     <em>PROJECT</em><br/>
@@ -2112,6 +2113,7 @@ function renderAllProjects(filter) {
       <div class="ap-card-links">${linksHtml}</div>
     </div>`;
   }).join('');
+  if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
 }
 
 document.querySelectorAll('.apf-btn').forEach(btn => {
