@@ -40,7 +40,7 @@
 &nbsp;
 <img src="https://img.shields.io/badge/📦_Projects-30%2B%20Built-080b14?style=flat-square&labelColor=9d174d" height="24"/>
 &nbsp;
-<img src="https://img.shields.io/badge/🌐_Live%20Demos-3%20Deployed-080b14?style=flat-square&labelColor=0e7490" height="24"/>
+<img src="https://img.shields.io/badge/🌐_Live%20Demos-4%2B%20Deployed-080b14?style=flat-square&labelColor=0e7490" height="24"/>
 &nbsp;
 <img src="https://komarev.com/ghpvc/?username=Ahmedyasser1905&label=👁+Views&color=080b14&labelColor=7c3aed&style=flat-square" height="24"/>
 
@@ -81,7 +81,7 @@ const developer = {
 
   projectCount: 30,
   portfolio   : "https://potfolio-six-neon.vercel.app/",
-  deployed    : ["potfolio-six-neon.vercel.app", "rawdha.vercel.app", "pfe-backend-tau.vercel.app", "faida-platform.vercel.app"],
+  deployed    : ["qissati.vercel.app", "potfolio-six-neon.vercel.app", "faida-platform.vercel.app", "rawdha.vercel.app", "pfe-backend-tau.vercel.app"],
   philosophy  : "Shipped > Perfect. Real > Impressive. Arabic-first when it matters.",
 
   currentFocus: [
@@ -349,6 +349,7 @@ Three-part ecosystem: **NestJS API** (live on Vercel, 4 open issues) · **React 
 
 | Project | Description | Stack | Demo |
 |---|---|---|---|
+| **📖 منصة قصتي (QISSATI)** | Custom stories e-commerce + Flutter RTL Admin app | Flutter · Supabase · Node.js · Firebase FCM | [▶](https://qissati.vercel.app) |
 | **🌾 Faida Platform** | Arabic RTL agri management — 5 roles + maps | React 18 · Vite · Tailwind · Zustand · Leaflet | [▶](https://faida-platform.vercel.app) |
 | **🪒 BarberDZ** | Salon booking monorepo — mobile + admin + API | React Native · NestJS · Supabase · PostGIS | — |
 | **⚡ Nova AI** | AI assistant — Gemini, OpenAI, OCR, PDF | React Native · Express · MongoDB · Docker | — |
