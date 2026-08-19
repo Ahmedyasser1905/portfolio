@@ -637,6 +637,7 @@ main { position: relative; z-index: 1; }
 /* Project visual backgrounds */
 .pv-faida   { background: radial-gradient(ellipse at 30% 30%, #0d2b0d 0%, #050f05 40%, #040608 100%); border-color: rgba(16,185,129,0.25); }
 .pv-barber  { background: radial-gradient(ellipse at 70% 30%, #1a0a3c 0%, #0a0520 40%, #040608 100%); border-color: rgba(124,58,237,0.3); }
+.pv-qissati { background: radial-gradient(ellipse at 50% 20%, #2a1a00 0%, #150d00 40%, #040608 100%); border-color: rgba(245,158,11,0.35); }
 .pv-nova    { background: radial-gradient(ellipse at 50% 20%, #2a0a1e 0%, #0f0510 40%, #040608 100%); border-color: rgba(244,63,94,0.25); }
 .pv-spy     { background: radial-gradient(ellipse at 60% 40%, #2a1500 0%, #130800 40%, #040608 100%); border-color: rgba(249,115,22,0.25); }
 .pv-rawdati { background: radial-gradient(ellipse at 40% 60%, #0a1e1e 0%, #050f10 40%, #040608 100%); border-color: rgba(6,182,212,0.25); }
@@ -1278,37 +1279,39 @@ footer a { color: var(--violet2); text-decoration: none; }
         </div>
       </div>
 
-      <!-- ── PROJECT 03: NOVA AI ── -->
+      <!-- ── PROJECT 03: QISSATI ── -->
       <div class="project-panel" data-project="2">
-        <div class="proj-counter">03 / 06 — AI Application</div>
+        <div class="proj-counter">03 / 06 — Full-Stack &amp; Mobile Ecosystem</div>
         <div class="proj-content">
           <div class="proj-num">03</div>
-          <div class="proj-category" style="color:#f43f5e">AI Integration · Multi-Model</div>
-          <h2 class="proj-title">Nova AI</h2>
-          <div class="proj-subtitle">Multi-Model Document Intelligence</div>
-          <p class="proj-desc">AI assistant that processes real documents. Upload a file → Tesseract OCR extracts text → PDF parsing → AI response from Gemini or OpenAI. Express backend with JWT auth, MongoDB, Docker, deployed on Render.</p>
+          <div class="proj-category" style="color:#f59e0b">Full-Stack · Flutter · Supabase · Arabic RTL</div>
+          <h2 class="proj-title">منصة قصتي</h2>
+          <div class="proj-subtitle">QISSATI — Custom Story E-Commerce &amp; Flutter Admin</div>
+          <p class="proj-desc">Comprehensive custom children story e-commerce platform. Interactive 5-step story builder web client, Flutter RTL admin app with real-time Firebase FCM push alerts, Supabase PostgreSQL database, Telegram Bot webhook dispatch, and Vercel serverless backend.</p>
           <div class="proj-pills">
-            <span class="proj-pill" style="color:#f43f5e;border-color:rgba(244,63,94,0.3)">React Native</span>
-            <span class="proj-pill">Gemini</span>
-            <span class="proj-pill">OpenAI</span>
-            <span class="proj-pill">Express</span>
-            <span class="proj-pill">MongoDB</span>
-            <span class="proj-pill">Docker</span>
-            <span class="proj-pill">Tesseract</span>
+            <span class="proj-pill" style="color:#f59e0b;border-color:rgba(245,158,11,0.3)">Flutter</span>
+            <span class="proj-pill">Supabase</span>
+            <span class="proj-pill">Node.js</span>
+            <span class="proj-pill">Firebase FCM</span>
+            <span class="proj-pill">Telegram Bot</span>
+            <span class="proj-pill">Vercel</span>
+            <span class="proj-pill">Arabic RTL</span>
           </div>
           <div class="proj-links">
+            <a href="https://qissati.vercel.app" target="_blank" rel="noopener" class="proj-link live">Live Demo ↗</a>
             <a href="https://github.com/Ahmedyasser1905" target="_blank" rel="noopener" class="proj-link">GitHub ↗</a>
             <button class="proj-link btn-ghost" data-modal="2">Details →</button>
           </div>
         </div>
         <div class="proj-visual-wrap">
-          <div class="proj-visual pv-nova" id="pv-2">
-            <div class="proj-visual-bg pv-nova"></div>
-            <div class="proj-float pf1">OCR</div>
-            <div class="proj-float pf2">Gemini</div>
-            <div class="proj-float pf3">OpenAI</div>
+          <div class="proj-visual pv-qissati" id="pv-2">
+            <div class="proj-visual-bg pv-qissati"></div>
+            <div class="proj-float pf1">Flutter App</div>
+            <div class="proj-float pf2">Supabase</div>
+            <div class="proj-float pf3">Telegram Bot</div>
             <div class="proj-visual-overlay">
-              <div class="proj-visual-code">// Tesseract → PDF parse → LLM response<br/>// Gemini + OpenAI · Express + MongoDB</div>
+              <div class="proj-visual-code">// E-Commerce + Flutter Admin App<br/>// Supabase PostgreSQL + Serverless Webhooks</div>
+              <div class="proj-live-badge"><div class="proj-live-dot" style="background:#f59e0b;box-shadow:0 0 8px #f59e0b"></div>qissati.vercel.app</div>
             </div>
           </div>
         </div>
@@ -1638,11 +1641,11 @@ const PROJECTS = [
     links:[{label:'GitHub →',url:'https://github.com/Ahmedyasser1905'}]
   },
   {
-    num:'03', title:'Nova AI', subtitle:'Multi-Model Document Intelligence',
-    category:'AI Integration · Multi-Model',
-    desc:`AI assistant that processes real documents through a pipeline: file upload → Tesseract OCR text extraction → PDF parsing → multi-model AI response from Gemini or OpenAI. Express.js backend with JWT authentication, MongoDB for conversation history, Docker containerized and deployed on Render. React Native mobile frontend.`,
-    tech:['React Native','Google Gemini','OpenAI API','Express.js','MongoDB','Docker','JWT','Tesseract OCR'],
-    links:[{label:'GitHub →',url:'https://github.com/Ahmedyasser1905'}]
+    num:'03', title:'منصة قصتي (QISSATI)', subtitle:'Custom Story E-Commerce & Flutter Admin Ecosystem',
+    category:'Full-Stack · Flutter · Supabase · Arabic RTL',
+    desc:`End-to-end customized children's story e-commerce platform. Features an interactive 5-step custom story creator on the web store, paired with a full-featured Flutter mobile admin app supporting complete Arabic RTL, order fulfillment workflows, direct WhatsApp/phone dispatch, offline-first reliability, Firebase FCM push notifications, Telegram Bot webhook synchronization, and a high-performance Vercel serverless Node.js backend backed by Supabase PostgreSQL.`,
+    tech:['Flutter','Dart','Supabase PostgreSQL','Node.js Express','Firebase FCM','Telegram Bot Webhook','Vercel Serverless','Arabic RTL'],
+    links:[{label:'Live Demo →',url:'https://qissati.vercel.app',live:true},{label:'GitHub →',url:'https://github.com/Ahmedyasser1905'}]
   },
   {
     num:'04', title:'SPY الجاسوس', subtitle:'Spyfall Party Game v2.0 — 3D Mobile',
@@ -1798,7 +1801,7 @@ document.addEventListener('mousemove', e => {
 const sceneColors = [
   { p: 0x10b981, s: 0x064e3b },  // faida: green
   { p: 0x7c3aed, s: 0x4c1d95 },  // barber: violet
-  { p: 0xf43f5e, s: 0x9f1239 },  // nova: rose
+  { p: 0xf59e0b, s: 0xb45309 },  // qissati: amber/gold
   { p: 0xf97316, s: 0x92400e },  // spy: orange
   { p: 0x06b6d4, s: 0x164e63 },  // rawdati: cyan
   { p: 0x6366f1, s: 0x3730a3 },  // pfe: indigo
@@ -1974,10 +1977,10 @@ const ALL_PROJECTS = [
     desc:'Monorepo: React Native client, Next.js admin, NestJS API, PostGIS geo-search, Docker on Render.',
     tech:['React Native','NestJS','Next.js','Supabase','PostGIS','Docker'],
     links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
-  { n:'03', name:'Nova AI', sub:'Multi-Model Document Intelligence', type:'ai', label:'AI · Mobile', color:'#f43f5e', featured:true,
-    desc:'Tesseract OCR + PDF parsing pipeline feeding Gemini/OpenAI. Express + MongoDB + Docker on Render.',
-    tech:['React Native','Gemini','OpenAI','Express','MongoDB','Docker'],
-    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'03', name:'منصة قصتي (QISSATI)', sub:'Custom Story E-Commerce & Flutter Admin', type:'mobile', label:'Full-Stack · Flutter', color:'#f59e0b', featured:true,
+    desc:'E-commerce platform for custom children stories. Flutter RTL admin app with Firebase FCM push alerts, Supabase PostgreSQL, Telegram Bot webhook, and Vercel serverless backend.',
+    tech:['Flutter','Dart','Supabase','Node.js','Telegram Bot','Firebase FCM','Vercel'],
+    links:[{t:'Live Demo ↗',u:'https://qissati.vercel.app',live:true},{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
   { n:'04', name:'SPY الجاسوس', sub:'Spyfall 3D Party Game', type:'game', label:'Mobile Game', color:'#f97316', featured:true,
     desc:'Spyfall party game with Three.js 3D via expo-gl, Arabic i18n, haptic feedback. Published as com.spygame.dz.',
     tech:['React Native','Three.js','Expo GL','i18next','Zustand','EAS'],
@@ -2078,10 +2081,10 @@ const ALL_PROJECTS = [
     desc:'Decision Support System academic project with XML data modeling and analysis exercises.',
     tech:['XML','Data Modeling'],
     links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
-  { n:'29', name:'منصة قصتي (QISSATI)', sub:'Custom Story E-Commerce & Flutter Admin', type:'mobile', label:'Full-Stack · Flutter', color:'#f59e0b', featured:false,
-    desc:'E-commerce platform for custom children stories. Flutter RTL admin app with Firebase FCM push alerts, Supabase PostgreSQL, Telegram Bot webhook, and Vercel serverless backend.',
-    tech:['Flutter','Dart','Supabase','Node.js','Telegram Bot','Firebase FCM','Vercel'],
-    links:[{t:'Live Demo ↗',u:'https://qissati.vercel.app',live:true},{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
+  { n:'29', name:'Nova AI', sub:'Multi-Model Document Intelligence', type:'ai', label:'AI · Mobile', color:'#f43f5e', featured:false,
+    desc:'Tesseract OCR + PDF parsing pipeline feeding Gemini/OpenAI. Express + MongoDB + Docker on Render.',
+    tech:['React Native','Gemini','OpenAI','Express','MongoDB','Docker'],
+    links:[{t:'GitHub ↗',u:'https://github.com/Ahmedyasser1905'}] },
   { n:'30', name:'APK Video Agent', sub:'AI Promo Video Automation', type:'ai', label:'AI · MCP Agent', color:'#8b5cf6', featured:false,
     desc:'Autonomous AI agent that tests Android APKs, analyzes UI via GPT-4o Vision, writes marketing scripts, generates ElevenLabs voiceovers, and renders cinematic promotional MP4s with FFmpeg.',
     tech:['Python','FastMCP','GPT-4o Vision','ElevenLabs','Whisper','FFmpeg','ADB'],
